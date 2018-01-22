@@ -1,0 +1,20 @@
+{
+    "description": "Automatically sorts nodes into a predefined structure which is created on the fly.",
+    "type": "neos-package",
+    "name": "punktde/archivist",
+    "license": "MIT",
+    "require": {
+        "php": "^7.0",
+        "neos/content-repository": "*"
+    },
+    "autoload": {
+        "psr-4": {
+            "PunktDe\\Archivist\\": "Classes/"
+        }
+    },
+    "extra": {
+        "neos": {
+            "package-key": "PunktDe.Archivist"
+        }
+    }
+}

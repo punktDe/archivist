@@ -1,0 +1,18 @@
+# Node Types for Functional Tests
+
+'PunktDe.Archivist.HierarchyNode':
+  superTypes:
+    'Neos.ContentRepository.Testing:Document': true
+  properties:
+    title:
+      type: string
+
+
+'PunktDe.Archivist.TriggerNode':
+  superTypes:
+    'Neos.ContentRepository.Testing:Document': true
+  properties:
+    title:
+      type: string
+    date:
+      type: DateTime
