@@ -1,5 +1,7 @@
 # PunktDe.Archivist 
 
+[![Travis Build Status](https://travis-ci.org/punktDe/archivist.svg?branch=master)](https://travis-ci.org/punktDe/archivist)
+
 **Purpose of this package:** Automatically sorts nodes into a predefined structure which is created on the fly.
 
 Neos has some drawbacks, if you store lots of Node - like news for example - on the same hierarchical level. 
@@ -7,7 +9,7 @@ Especially the backend trees are getting slow and confusing. This package automa
 automatically created hierarchy.
 
 This package is inspired by the package [Sitegeist Critical Mass](https://github.com/sitegeist/Sitegeist.CriticalMass), 
-but solves only the purpose described above. 
+but requires the new react UI. 
 
 ## Configuration
 
