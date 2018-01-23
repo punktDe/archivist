@@ -28,15 +28,15 @@ class ArchivistTest extends AbstractNodeTest
         // The hierarchy is created
         $lvl1 = $this->node->getChildNodes('PunktDe.Archivist.HierarchyNode')[0];
         $this->assertInstanceOf(NodeInterface::class, $lvl1);
-        $this->assertEquals('2017', $lvl1->getProperty('title'));
+        $this->assertEquals('2018', $lvl1->getProperty('title'));
 
         $lvl2 = $lvl1->getChildNodes('PunktDe.Archivist.HierarchyNode')[0];
         $this->assertInstanceOf(NodeInterface::class, $lvl2);
         $this->assertEquals('01', $lvl2->getProperty('title'));
-        $this->assertEquals($this->nodeContextPath . '/2017/1', $lvl2->getPath());
+        $this->assertEquals($this->nodeContextPath . '/2018/1', $lvl2->getPath());
 
         // The node is sorted in the hierarchy
-        $this->assertEquals($this->nodeContextPath . '/2017/1/trigger-node', $newNode->getPath());
+        $this->assertEquals($this->nodeContextPath . '/2018/1/trigger-node', $newNode->getPath());
     }
 
     /**
@@ -54,19 +54,19 @@ class ArchivistTest extends AbstractNodeTest
      * @test
      */
     public function hierarchyNodesAreSortedCorrectlyWithSimpleProperty() {
-        $this->triggerNodeCreation('trigger-node1', ['date' => new \DateTime('2017-01-20')]);
-        $this->triggerNodeCreation('trigger-node2', ['date' => new \DateTime('2016-01-19')]);
+        $this->triggerNodeCreation('trigger-node1', ['date' => new \DateTime('2018-01-20')]);
+        $this->triggerNodeCreation('trigger-node2', ['date' => new \DateTime('2017-01-19')]);
 
         $yearNodes = $this->node->getChildNodes('PunktDe.Archivist.HierarchyNode');
-        $this->assertEquals('2016', $yearNodes[0]->getProperty('title'));
-        $this->assertEquals('2017', $yearNodes[1]->getProperty('title'));
+        $this->assertEquals('2017', $yearNodes[0]->getProperty('title'));
+        $this->assertEquals('2018', $yearNodes[1]->getProperty('title'));
     }
 
     /**
      * @test
      */
     public function hierarchyNodesAreSortedCorrectlyWithEelExpression() {
-        $this->triggerNodeCreation('trigger-node1', ['date' => new \DateTime('2017-02-20')]);
+        $this->triggerNodeCreation('trigger-node1', ['date' => new \DateTime('2018-02-20')]);
         $this->triggerNodeCreation('trigger-node2', ['date' => new \DateTime('2016-01-19')]);
 
         $monthNodes = (new FlowQuery([$this->node]))->children('[instanceof PunktDe.Archivist.HierarchyNode]')->children('[instanceof PunktDe.Archivist.HierarchyNode]')->get();
@@ -88,6 +88,26 @@ class ArchivistTest extends AbstractNodeTest
     }
 
     /**
+     * @test
+     */
+    public function nodesAreSortedIfHierarchyAlreadyExist() {
+        $triggerNode2 = $this->triggerNodeCreation('trigger-node2', ['title' => 'Node 2']);
+        $triggerNode1 = $this->triggerNodeCreation('trigger-node1', ['title' => 'Node 1']);
+
+        $yearNode = (new FlowQuery([$this->node]))->children('[instanceof PunktDe.Archivist.HierarchyNode]')->get(0);
+        $this->assertEquals('2018', $yearNode->getProperty('title'));
+
+        $monthNode = (new FlowQuery([$yearNode]))->children('[instanceof PunktDe.Archivist.HierarchyNode]')->get(0);
+        $this->assertEquals('1', $monthNode->getProperty('title'));
+
+        $childNodes = $monthNode->getChildNodes();
+
+        $this->assertCount(2, $childNodes);
+        $this->assertSame($triggerNode1, $childNodes[0]);
+        $this->assertSame($triggerNode2, $childNodes[1]);
+    }
+
+    /**
      * @param string $nodeName
      * @param array $properties
      * @return \Neos\ContentRepository\Domain\Model\NodeInterface
@@ -96,7 +116,7 @@ class ArchivistTest extends AbstractNodeTest
     {
         $defaultProperties = [
             'title' => 'New Article',
-            'date' => new \DateTime('2017-01-19')
+            'date' => new \DateTime('2018-01-19')
         ];
 
         $properties = array_merge($defaultProperties, $properties);
@@ -113,5 +133,4 @@ class ArchivistTest extends AbstractNodeTest
 
         return $this->node->createNodeFromTemplate($triggerNodeTemplate, $nodeName);
     }
-
 }
