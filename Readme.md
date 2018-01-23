@@ -16,7 +16,7 @@ You can configure the behavior differently for every triggering node type.
 ## Example Configuration
 
     PunktDe:
-      Archivist:**
+      Archivist:
         sortingInstructions:
           # Configuration for the node 'PunktDe.Archivist.TriggerNode'
           'PunktDe.Archivist.TriggerNode':
