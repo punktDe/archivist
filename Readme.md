@@ -1,6 +1,6 @@
 # PunktDe.Archivist 
 
-[![Travis Build Status](https://travis-ci.org/punktDe/archivist.svg?branch=master)](https://travis-ci.org/punktDe/archivist)
+[![Travis Build Status](https://travis-ci.org/punktDe/archivist.svg?branch=master)](https://travis-ci.org/punktDe/archivist) [![Latest Stable Version](https://poser.pugx.org/punktde/archivist/v/stable)](https://packagist.org/packages/punktde/archivist) [![Total Downloads](https://poser.pugx.org/punktde/archivist/downloads)](https://packagist.org/packages/punktde/archivist)
 
 **Purpose of this package:** Automatically sorts nodes into a predefined structure which is created on the fly.
 
