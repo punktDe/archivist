@@ -6,8 +6,8 @@
     "require": {
         "php": "^7.0",
         "neos/neos": "^3.3",
-        "neos/neos-ui": "^1.0",
-        "neos/neos-ui-compiled": "^1.0"
+        "neos/neos-ui": "~1.0.5 || dev-master",
+        "neos/neos-ui-compiled": "~1.0.5 || dev-master"
     },
     "autoload": {
         "psr-4": {
