@@ -23,14 +23,14 @@ You can configure the behavior differently for every triggering node type.
           # Configuration for the node 'PunktDe.Archivist.TriggerNode'
           'PunktDe.Archivist.TriggerNode':
             # The query selecting the root node of the automatically created hierarchy
-            root: "${q(site).find('[instanceof Neos.ContentRepository.Testing:Page]').get(0)}"
+            hierarchyRoot: "${q(site).find('[instanceof Neos.ContentRepository.Testing:Page]').get(0)}"
     
             # Optional: The sorting of the nodes inside the target hierarchy. Can be the name of a property or an eel expression like seen below
             sorting: title
-     
+    
             context:
               publishDate: "${node.properties.date}"
-     
+    
             # Definition of the auto-generated hierarchy
             hierarchy:
               -
@@ -44,11 +44,11 @@ You can configure the behavior differently for every triggering node type.
                 identity: title
                 # An eel query that describes the sorting condition
                 sorting: "${q(a).property('title') < q(b).property('title')}"
-                 
               -
                 type: 'PunktDe.Archivist.HierarchyNode'
                 properties:
                   name: "${Date.month(publishDate)}"
                   title: "${Date.month(publishDate)}"
                 identity: title
+                # Simple sorting on a property
                 sorting: title

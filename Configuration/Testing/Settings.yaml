@@ -4,7 +4,7 @@ PunktDe:
       # Configuration for the node 'PunktDe.Archivist.TriggerNode'
       'PunktDe.Archivist.TriggerNode':
         # The query selecting the root node of the automatically created hierarchy
-        root: "${q(site).find('[instanceof Neos.ContentRepository.Testing:Page]').get(0)}"
+        hierarchyRoot: "${q(site).find('[instanceof Neos.ContentRepository.Testing:Page]').get(0)}"
 
         # Optional: The sorting of the nodes inside the target hierarchy. Can be the name of a property or an eel expression like seen below
         sorting: title
@@ -31,4 +31,5 @@ PunktDe:
               name: "${Date.month(publishDate)}"
               title: "${Date.month(publishDate)}"
             identity: title
+            # Simple sorting on a property
             sorting: title

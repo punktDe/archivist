@@ -1,5 +1,4 @@
 <?php
-
 namespace PunktDe\Archivist\Service;
 
 /*
@@ -61,7 +60,7 @@ class HierarchyService
     public function buildHierarchy(array $hierarchyConfiguration, array $context): NodeInterface
     {
         $targetNode = null;
-        $parent = $context['root'];
+        $parent = $context['hierarchyRoot'];
 
         foreach ($hierarchyConfiguration as $hierarchyLevelConfiguration) {
             $parent = $this->buildHierarchyLevel($parent, $hierarchyLevelConfiguration, $context);
@@ -77,7 +76,7 @@ class HierarchyService
      * @return NodeInterface
      * @throws ArchivistConfigurationException
      */
-    protected function buildHierarchyLevel(NodeInterface $parentNode, array $hierarchyLevelConfiguration, array $context)
+    protected function buildHierarchyLevel(NodeInterface $parentNode, array $hierarchyLevelConfiguration, array $context): NodeInterface
     {
         $hierarchyLevelNodeName = null;
         $this->evaluateHierarchyLevelConfiguration($hierarchyLevelConfiguration);

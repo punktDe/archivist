@@ -88,16 +88,16 @@ class Archivist
             'node' => $node
         ];
 
-        if (!isset($sortingInstructions['root'])) {
-            throw new ArchivistConfigurationException('You need to set an eel expression to determine the "root" node to sort the node into.', 1516348967);
+        if (!isset($sortingInstructions['hierarchyRoot'])) {
+            throw new ArchivistConfigurationException('You need to set an eel expression to determine the "hierarchyRoot" node to sort the node into.', 1516348967);
         }
 
-        $collectionRoot = $this->eelEvaluationService->evaluateIfValidEelExpression($sortingInstructions['root'], $context);
-        if (!($collectionRoot instanceof NodeInterface)) {
-            throw new ArchivistConfigurationException('The root node defined was not found.', 1516348968);
+        $hierarchyRoot = $this->eelEvaluationService->evaluateIfValidEelExpression($sortingInstructions['hierarchyRoot'], $context);
+        if (!($hierarchyRoot instanceof NodeInterface)) {
+            throw new ArchivistConfigurationException('The hierarchyRoot node defined was not found.', 1516348968);
         }
 
-        $context['root'] = $collectionRoot;
+        $context['hierarchyRoot'] = $hierarchyRoot;
 
         return $context;
     }

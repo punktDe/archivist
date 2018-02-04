@@ -23,7 +23,12 @@ class SortingService
      */
     protected $logger;
 
-    public function sort(NodeInterface $parentNode, $eelOrProperty, $nodeTypeFilter)
+    /**
+     * @param NodeInterface $parentNode
+     * @param string $eelOrProperty
+     * @param string $nodeTypeFilter
+     */
+    public function sort(NodeInterface $parentNode, string $eelOrProperty, $nodeTypeFilter)
     {
         if ($this->eelEvaluationService->isValidExpression($eelOrProperty)) {
             $eelExpression = $eelOrProperty;
@@ -39,7 +44,7 @@ class SortingService
      * @param string $nodeTypeFilter
      * @return void
      */
-    protected function sortChildNodesByEelExpression(NodeInterface $parenNode, $eelExpression, $nodeTypeFilter)
+    protected function sortChildNodesByEelExpression(NodeInterface $parenNode, string $eelExpression, $nodeTypeFilter)
     {
         $nodes = $parenNode->getChildNodes($nodeTypeFilter);
         $object = null;
