@@ -2,8 +2,11 @@
 namespace PunktDe\Archivist\Service;
 
 /*
- *  (c) 2018 punkt.de GmbH - Karlsruhe, Germany - http://punkt.de
- *  All rights reserved.
+ * This file is part of the PunktDe.Archivist package.
+ *
+ * This package is open source software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
  */
 
 use Neos\ContentRepository\Domain\Repository\NodeDataRepository;
@@ -73,12 +76,12 @@ class HierarchyService
      * @param NodeInterface $parentNode
      * @param array $hierarchyLevelConfiguration
      * @param array $context
-     * @return NodeInterface
+     * @return NodeInterface The created or found hierarchy node
      * @throws ArchivistConfigurationException
      */
     protected function buildHierarchyLevel(NodeInterface $parentNode, array $hierarchyLevelConfiguration, array $context): NodeInterface
     {
-        $hierarchyLevelNodeName = null;
+        $hierarchyLevelNodeName = '';
         $this->evaluateHierarchyLevelConfiguration($hierarchyLevelConfiguration);
 
         $hierarchyLevelNodeType = $this->nodeTypeManager->getNodeType($hierarchyLevelConfiguration['type']);
@@ -93,6 +96,10 @@ class HierarchyService
 
         if (isset($hierarchyLevelConfiguration['properties']['name'])) {
             $hierarchyLevelNodeName = (string)$this->eelEvaluationService->evaluateIfValidEelExpression($hierarchyLevelConfiguration['properties']['name'], $context);
+        }
+
+        if ($hierarchyLevelNodeName === '') {
+            return $parentNode;
         }
 
         $hierarchyLevelNodeTemplate = new NodeTemplate();
@@ -111,7 +118,7 @@ class HierarchyService
         $this->logger->log(sprintf('Built hierarchy level on path %s with node type %s ', $hierarchyLevelNode->getPath(), $hierarchyLevelConfiguration['type']), LOG_DEBUG);
 
         if (isset($hierarchyLevelConfiguration['sorting'])) {
-            $this->sortingService->sort($parentNode, $hierarchyLevelConfiguration['sorting'], $hierarchyLevelNodeType->getName());
+            $this->sortingService->sortChildren($parentNode, $hierarchyLevelConfiguration['sorting'], $hierarchyLevelNodeType->getName());
         }
 
         return $hierarchyLevelNode;

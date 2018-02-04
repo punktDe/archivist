@@ -17,30 +17,76 @@ You can configure the behavior differently for every triggering node type. The c
 are best explained by example. These examples are taken from ``Configuration/Testing/Settings.yaml``
 and are thus automatically tested. 
 
-## Example Configurations
-    
+### Simple Example
+
+Configuration for the nodeType 'PunktDe.Archivist.TriggerNode'. The sorting is triggered if a
+node of this type is created or if a property on this node is changed. This node is than
+available as 'node' in the other parts of the configuration
+
+PunktDe:
+  Archivist:
+    sortingInstructions:
+
+      'PunktDe.Archivist.TriggerNode':
+
+        # The query selecting the root node of the automatically created hierarchy
+        hierarchyRoot: "${q(site).find('[instanceof Neos.ContentRepository.Testing:Page]').get(0)}"
+
+        # Optional: The sorting of the nodes inside the target hierarchy. Can be the name of a property
+        # or an eel expression like seen below
+        sorting: title
+
+        # In the context is evaluated first. You can define variables here which you can use in
+        # the remaining configuration
+        context:
+          publishDate: "${node.properties.date}"
+
+        # Definition of the auto-generated hierarchy
+        hierarchy:
+          -
+            # The type of the hierarchy-node
+            type: 'PunktDe.Archivist.HierarchyNode'
+
+            # Properties of the new created node.
+            properties:
+              name: "${Date.year(publishDate)}"
+              title: "${Date.year(publishDate)}"
+
+            # The property which is identical throughout all nodes of this level
+            identity: title
+
+            # An eel query that describes the sorting condition
+            sorting: "${q(a).property('title') < q(b).property('title')}"
+          -
+            type: 'PunktDe.Archivist.HierarchyNode'
+            properties:
+              name: "${Date.month(publishDate)}"
+              title: "${Date.month(publishDate)}"
+            identity: title
+
+            # Simple sorting on a property
+            sorting: title
+
+
+### Example with a triggering content node
+
+A content node triggers the move of its parent document node. For example, if you have a
+title node which should be considered to move the page.
+
     PunktDe:
       Archivist:
         sortingInstructions:
-    
-          # Simple Example
-          #
-          # Configuration for the nodeType 'PunktDe.Archivist.TriggerNode'. The sorting is triggered if a
-          # node of this type is created or if a property on this node is changed. This node is than
-          # available as 'node' in the other parts of the configuration
-          'PunktDe.Archivist.TriggerNode':
+          'PunktDe.Archivist.TriggerContentNode':
     
             # The query selecting the root node of the automatically created hierarchy
             hierarchyRoot: "${q(site).find('[instanceof Neos.ContentRepository.Testing:Page]').get(0)}"
     
-            # Optional: The sorting of the nodes inside the target hierarchy. Can be the name of a property
-            # or an eel expression like seen below
-            sorting: title
-    
-            # In the context is evaluated first. You can define variables here which you can use in
-            # the remaining configuration
-            context:
-              publishDate: "${node.properties.date}"
+            # Optional: The node to be moved, described by an Eel query.
+            # This defaults to the triggering node if not set. The triggering node is available as "node".
+            # If the affected node is not found by the operation is skipped.
+            # This can for example be used if a change in a content node should move its parent document node
+            #
+            affectedNode: "${q(node).parent('[instanceof Neos.ContentRepository.Testing:Document]').get(0)}"
     
             # Definition of the auto-generated hierarchy
             hierarchy:
@@ -50,20 +96,5 @@ and are thus automatically tested.
     
                 # Properties of the new created node.
                 properties:
-                  name: "${Date.year(publishDate)}"
-                  title: "${Date.year(publishDate)}"
-    
-                # The property which is identical throughout all nodes of this level
-                identity: title
-    
-                # An eel query that describes the sorting condition
-                sorting: "${q(a).property('title') < q(b).property('title')}"
-              -
-                type: 'PunktDe.Archivist.HierarchyNode'
-                properties:
-                  name: "${Date.month(publishDate)}"
-                  title: "${Date.month(publishDate)}"
-                identity: title
-    
-                # Simple sorting on a property
-                sorting: title
+                  name: "${String.charAt(node.properties.title, 0)}"
+                  title: "${String.charAt(node.properties.title, 0)}"

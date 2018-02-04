@@ -47,16 +47,29 @@ PunktDe:
             # Simple sorting on a property
             sorting: title
 
-#      # Example triggering content node
-#      #
-#      # A content node triggers the move of its parent document node
-#      'PunktDe.Archivist.TriggerContentNode':
-#
-#        # The query selecting the root node of the automatically created hierarchy
-#        hierarchyRoot: "${q(site).find('[instanceof Neos.ContentRepository.Testing:Page]').get(0)}"
-#
-#        # The node to be moved. This defaults to the triggering node and is available as node.
-#        # This can for example be used if a change in a content node should move its parent document node
-#        #
-#        targetNode: "${q(node).parent('[instanceof PunktDe.Archivist.TriggerNode]').get(0)}"
+      # Example triggering content node
+      #
+      # A content node triggers the move of its parent document node. For example, you have a
+      # title node which should be considered to move the page.
+      'PunktDe.Archivist.TriggerContentNode':
 
+        # The query selecting the root node of the automatically created hierarchy
+        hierarchyRoot: "${q(site).find('[instanceof Neos.ContentRepository.Testing:Page]').get(0)}"
+
+        # Optional: The node to be moved, described by an Eel query.
+        # This defaults to the triggering node if not set. The triggering node is available as "node".
+        # If the affected node is not found by the operation is skipped.
+        # This can for example be used if a change in a content node should move its parent document node
+        #
+        affectedNode: "${q(node).parent('[instanceof Neos.ContentRepository.Testing:Document]').get(0)}"
+
+        # Definition of the auto-generated hierarchy
+        hierarchy:
+          -
+            # The type of the hierarchy-node
+            type: 'PunktDe.Archivist.HierarchyNode'
+
+            # Properties of the new created node.
+            properties:
+              name: "${String.charAt(node.properties.title, 0)}"
+              title: "${String.charAt(node.properties.title, 0)}"

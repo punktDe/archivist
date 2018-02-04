@@ -1,7 +1,13 @@
 <?php
-
 namespace PunktDe\Archivist;
 
+/*
+ * This file is part of the PunktDe.Archivist package.
+ *
+ * This package is open source software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use Neos\ContentRepository\Domain\Repository\NodeDataRepository;
 use Neos\Eel\FlowQuery\FlowQuery;
@@ -51,26 +57,41 @@ class Archivist
     protected $context;
 
     /**
-     * @param NodeInterface $node
+     * @param NodeInterface $triggeringNode
      * @param array $sortingInstructions
      */
-    public function sortNode(NodeInterface $node, array $sortingInstructions)
+    public function organizeNode(NodeInterface $triggeringNode, array $sortingInstructions)
     {
+        if (isset($sortingInstructions['affectedNode'])) {
+            $affectedNode = $this->eelEvaluationService->evaluate($sortingInstructions['affectedNode'], ['node' => $triggeringNode]);
+            if (!($affectedNode instanceof NodeInterface)) {
+                $this->logger->log(sprintf('A node of type %s (%s) triggered node organization but the affectedNode was not found.', $triggeringNode->getNodeType()->getName(), $triggeringNode->getIdentifier()));
+                return;
+            }
+        } else {
+            $affectedNode = $triggeringNode;
+        }
+
         $this->nodeDataRepository->persistEntities();
-        $this->logger->log(sprintf('Organize node of type %s with path %s', $node->getNodeType()->getName(), $node->getPath()), LOG_DEBUG);
-        $context = $this->buildBaseContext($node, $sortingInstructions);
+
+        $this->logger->log(sprintf('Organize node of type %s with path %s', $triggeringNode->getNodeType()->getName(), $triggeringNode->getPath()), LOG_DEBUG);
+        $context = $this->buildBaseContext($triggeringNode, $sortingInstructions);
 
         if (isset($sortingInstructions['context']) && is_array($sortingInstructions['context'])) {
             $context = $this->buildCustomContext($context, $sortingInstructions['context']);
         }
 
         if (isset($sortingInstructions['hierarchy']) && is_array($sortingInstructions['hierarchy'])) {
-            $targetNode = $this->hierarchyService->buildHierarchy($sortingInstructions['hierarchy'], $context);
-            $node->moveInto($targetNode);
-        }
+            $hierarchyNode = $this->hierarchyService->buildHierarchy($sortingInstructions['hierarchy'], $context);
 
-        if (isset($sortingInstructions['sorting'])) {
-            $this->sortingService->sort($targetNode, $sortingInstructions['sorting'], null);
+            if($affectedNode->getParent() !== $hierarchyNode) {
+                $affectedNode->moveInto($hierarchyNode);
+                $this->logger->log(sprintf('Moved node %s into hierarchy node %s', $affectedNode->getNodeType()->getName(), $hierarchyNode->getNodeType()->getName()), LOG_DEBUG);
+            }
+
+            if (isset($sortingInstructions['sorting'])) {
+                $this->sortingService->sortChildren($hierarchyNode, $sortingInstructions['sorting'], null);
+            }
         }
     }
 

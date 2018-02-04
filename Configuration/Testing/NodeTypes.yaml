@@ -16,3 +16,10 @@
       type: string
     date:
       type: DateTime
+
+'PunktDe.Archivist.TriggerContentNode':
+  superTypes:
+    'Neos.ContentRepository.Testing:Content': true
+  properties:
+    title:
+      type: string

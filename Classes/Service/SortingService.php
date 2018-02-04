@@ -1,6 +1,13 @@
 <?php
-
 namespace PunktDe\Archivist\Service;
+
+/*
+ * This file is part of the PunktDe.Archivist package.
+ *
+ * This package is open source software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
+ */
 
 use Neos\Flow\Annotations as Flow;
 use Neos\ContentRepository\Domain\Model\NodeInterface;
@@ -28,7 +35,7 @@ class SortingService
      * @param string $eelOrProperty
      * @param string $nodeTypeFilter
      */
-    public function sort(NodeInterface $parentNode, string $eelOrProperty, $nodeTypeFilter)
+    public function sortChildren(NodeInterface $parentNode, string $eelOrProperty, $nodeTypeFilter)
     {
         if ($this->eelEvaluationService->isValidExpression($eelOrProperty)) {
             $eelExpression = $eelOrProperty;

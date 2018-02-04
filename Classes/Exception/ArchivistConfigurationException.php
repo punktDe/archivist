@@ -2,8 +2,11 @@
 namespace PunktDe\Archivist\Exception;
 
 /*
- *  (c) 2018 punkt.de GmbH - Karlsruhe, Germany - http://punkt.de
- *  All rights reserved.
+ * This file is part of the PunktDe.Archivist package.
+ *
+ * This package is open source software. For the full copyright and license
+ * information, please view the LICENSE file which was distributed with this
+ * source code.
  */
 
 use Neos\Flow\Exception;
