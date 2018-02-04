@@ -1,14 +1,22 @@
 PunktDe:
   Archivist:
     sortingInstructions:
-      # Configuration for the node 'PunktDe.Archivist.TriggerNode'
+
+      # Simple Example
+      #
+      # Configuration for the nodeType 'PunktDe.Archivist.TriggerNode'. The sorting is triggered if a node of this type is
+      # created or if a property on this node is changed. This node is than available as 'node' in the other parts of the configuration
       'PunktDe.Archivist.TriggerNode':
+
         # The query selecting the root node of the automatically created hierarchy
         hierarchyRoot: "${q(site).find('[instanceof Neos.ContentRepository.Testing:Page]').get(0)}"
 
-        # Optional: The sorting of the nodes inside the target hierarchy. Can be the name of a property or an eel expression like seen below
+        # Optional: The sorting of the nodes inside the target hierarchy. Can be the name of a property or an eel
+        # expression like seen below
         sorting: title
 
+        # In the context is evaluated first. You can define variables here which you can use in the remaining
+        # configuration
         context:
           publishDate: "${node.properties.date}"
 
@@ -17,12 +25,15 @@ PunktDe:
           -
             # The type of the hierarchy-node
             type: 'PunktDe.Archivist.HierarchyNode'
+
             # Properties of the new created node.
             properties:
               name: "${Date.year(publishDate)}"
               title: "${Date.year(publishDate)}"
+
             # The property which is identical throughout all nodes of this level
             identity: title
+
             # An eel query that describes the sorting condition
             sorting: "${q(a).property('title') < q(b).property('title')}"
           -
@@ -31,5 +42,20 @@ PunktDe:
               name: "${Date.month(publishDate)}"
               title: "${Date.month(publishDate)}"
             identity: title
+
             # Simple sorting on a property
             sorting: title
+
+#      # Example triggering content node
+#      #
+#      # A content node triggers the move of its parent document node
+#      'PunktDe.Archivist.TriggerContentNode':
+#
+#        # The query selecting the root node of the automatically created hierarchy
+#        hierarchyRoot: "${q(site).find('[instanceof Neos.ContentRepository.Testing:Page]').get(0)}"
+#
+#        # The node to be moved. This defaults to the triggering node and is available as node.
+#        # This can for example be used if a change in a content node should move its parent document node
+#        #
+#        targetNode: "${q(node).parent('[instanceof PunktDe.Archivist.TriggerNode]').get(0)}"
+

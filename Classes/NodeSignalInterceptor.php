@@ -26,4 +26,18 @@ class NodeSignalInterceptor
 
         (new Archivist())->sortNode($node, $this->sortingInstructions[$node->getNodeType()->getName()]);
     }
+
+    /**
+     * @param NodeInterface $node
+     * @param string $propertyName
+     * @param $oldValue
+     * @param $value
+     */
+    public function nodePropertyChanged(NodeInterface $node, string $propertyName, $oldValue, $value) {
+        if(!array_key_exists($node->getNodeType()->getName(), $this->sortingInstructions)) {
+            return;
+        }
+
+        (new Archivist())->sortNode($node, $this->sortingInstructions[$node->getNodeType()->getName()]);
+    }
 }

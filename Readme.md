@@ -9,25 +9,35 @@ Especially the backend trees are getting slow and confusing. This package automa
 automatically created hierarchy.
 
 This package is inspired by the package [Sitegeist Critical Mass](https://github.com/sitegeist/Sitegeist.CriticalMass), 
-but requires the new react UI. 
+but build for the new react UI, with extended feature set and fully tested. 
 
 ## Configuration
 
-You can configure the behavior differently for every triggering node type.
+You can configure the behavior differently for every triggering node type. The configuration options 
+are best explained by example. These examples are taken from ``Configuration/Testing/Settings.yaml``
+and are thus automatically tested. 
 
-## Example Configuration
+## Example Configurations
 
     PunktDe:
       Archivist:
         sortingInstructions:
-          # Configuration for the node 'PunktDe.Archivist.TriggerNode'
+    
+          # Simple Example
+          #
+          # Configuration for the nodeType 'PunktDe.Archivist.TriggerNode'. The sorting is triggered if a node of this type is
+          # created or if a property on this node is changed. This node is than available as 'node' in the other parts of the configuration
           'PunktDe.Archivist.TriggerNode':
+    
             # The query selecting the root node of the automatically created hierarchy
             hierarchyRoot: "${q(site).find('[instanceof Neos.ContentRepository.Testing:Page]').get(0)}"
     
-            # Optional: The sorting of the nodes inside the target hierarchy. Can be the name of a property or an eel expression like seen below
+            # Optional: The sorting of the nodes inside the target hierarchy. Can be the name of a property or an eel
+            # expression like seen below
             sorting: title
     
+            # In the context is evaluated first. You can define variables here which you can use in the remaining
+            # configuration
             context:
               publishDate: "${node.properties.date}"
     
@@ -36,12 +46,15 @@ You can configure the behavior differently for every triggering node type.
               -
                 # The type of the hierarchy-node
                 type: 'PunktDe.Archivist.HierarchyNode'
+    
                 # Properties of the new created node.
                 properties:
                   name: "${Date.year(publishDate)}"
                   title: "${Date.year(publishDate)}"
+    
                 # The property which is identical throughout all nodes of this level
                 identity: title
+    
                 # An eel query that describes the sorting condition
                 sorting: "${q(a).property('title') < q(b).property('title')}"
               -
@@ -50,5 +63,6 @@ You can configure the behavior differently for every triggering node type.
                   name: "${Date.month(publishDate)}"
                   title: "${Date.month(publishDate)}"
                 identity: title
+    
                 # Simple sorting on a property
                 sorting: title

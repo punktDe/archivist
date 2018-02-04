@@ -60,7 +60,7 @@ class SortingService
             }
         }
 
-        if ($object !== null) {
+        if ($object !== null && $nodeA !== $object) {
             $this->logger->log(sprintf('Moving node %s before %s', $nodeA, $object), LOG_DEBUG);
             $nodeA->moveBefore($object);
         }

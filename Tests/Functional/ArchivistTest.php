@@ -108,11 +108,26 @@ class ArchivistTest extends AbstractNodeTest
     }
 
     /**
+     * @test
+     */
+    public function changedPropertyTriggersNodeReSorting() {
+        $triggerNode = $this->triggerNodeCreation('trigger-node', ['title' => 'Node 1']);
+        $expectedPath = $this->node->getPath() . '/2018/1/trigger-node';
+        $this->assertEquals($expectedPath, $triggerNode->getPath());
+
+        $triggerNode->setProperty('date', new \DateTime('2018-02-04'));
+        $expectedPath = $this->node->getPath() . '/2018/2/trigger-node';
+        $this->assertEquals($expectedPath, $triggerNode->getPath());
+    }
+
+
+    /**
      * @param string $nodeName
      * @param array $properties
+     * @param string $triggerNodeType
      * @return \Neos\ContentRepository\Domain\Model\NodeInterface
      */
-    protected function triggerNodeCreation($nodeName = 'trigger-node', array $properties = [])
+    protected function triggerNodeCreation($nodeName = 'trigger-node', array $properties = [], $triggerNodeType = 'PunktDe.Archivist.TriggerNode')
     {
         $defaultProperties = [
             'title' => 'New Article',
@@ -122,7 +137,7 @@ class ArchivistTest extends AbstractNodeTest
         $properties = array_merge($defaultProperties, $properties);
 
         $nodeTypeManager = $this->objectManager->get(NodeTypeManager::class);
-        $triggerNodeType = $nodeTypeManager->getNodeType('PunktDe.Archivist.TriggerNode');
+        $triggerNodeType = $nodeTypeManager->getNodeType($triggerNodeType);
 
         $triggerNodeTemplate = new NodeTemplate();
         $triggerNodeTemplate->setNodeType($triggerNodeType);

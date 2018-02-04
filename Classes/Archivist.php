@@ -57,7 +57,7 @@ class Archivist
     public function sortNode(NodeInterface $node, array $sortingInstructions)
     {
         $this->nodeDataRepository->persistEntities();
-        $this->logger->log(sprintf('Sorting node of type %s with identifier %s', $node->getNodeType()->getName(), $node->getIdentifier()), LOG_DEBUG);
+        $this->logger->log(sprintf('Organize node of type %s with path %s', $node->getNodeType()->getName(), $node->getPath()), LOG_DEBUG);
         $context = $this->buildBaseContext($node, $sortingInstructions);
 
         if (isset($sortingInstructions['context']) && is_array($sortingInstructions['context'])) {
