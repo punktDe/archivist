@@ -18,26 +18,27 @@ are best explained by example. These examples are taken from ``Configuration/Tes
 and are thus automatically tested. 
 
 ## Example Configurations
-
+    
     PunktDe:
       Archivist:
         sortingInstructions:
     
           # Simple Example
           #
-          # Configuration for the nodeType 'PunktDe.Archivist.TriggerNode'. The sorting is triggered if a node of this type is
-          # created or if a property on this node is changed. This node is than available as 'node' in the other parts of the configuration
+          # Configuration for the nodeType 'PunktDe.Archivist.TriggerNode'. The sorting is triggered if a
+          # node of this type is created or if a property on this node is changed. This node is than
+          # available as 'node' in the other parts of the configuration
           'PunktDe.Archivist.TriggerNode':
     
             # The query selecting the root node of the automatically created hierarchy
             hierarchyRoot: "${q(site).find('[instanceof Neos.ContentRepository.Testing:Page]').get(0)}"
     
-            # Optional: The sorting of the nodes inside the target hierarchy. Can be the name of a property or an eel
-            # expression like seen below
+            # Optional: The sorting of the nodes inside the target hierarchy. Can be the name of a property
+            # or an eel expression like seen below
             sorting: title
     
-            # In the context is evaluated first. You can define variables here which you can use in the remaining
-            # configuration
+            # In the context is evaluated first. You can define variables here which you can use in
+            # the remaining configuration
             context:
               publishDate: "${node.properties.date}"
     
