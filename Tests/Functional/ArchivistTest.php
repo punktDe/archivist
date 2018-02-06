@@ -1,4 +1,5 @@
 <?php
+
 namespace PunktDe\Archivist\Tests\Functional;
 
 /*
@@ -13,6 +14,7 @@ use Neos\ContentRepository\Domain\Model\NodeInterface;
 use Neos\ContentRepository\Domain\Model\NodeTemplate;
 use Neos\ContentRepository\Domain\Service\NodeTypeManager;
 use Neos\ContentRepository\Tests\Functional\AbstractNodeTest;
+use Neos\Eel\Exception;
 use Neos\Eel\FlowQuery\FlowQuery;
 
 class ArchivistTest extends AbstractNodeTest
@@ -58,6 +60,19 @@ class ArchivistTest extends AbstractNodeTest
 
         // The node is sorted in the hierarchy
         $this->assertEquals($this->nodeContextPath . '/2018/1/trigger-node', $newNode->getPath());
+    }
+
+
+    /**
+     * @test
+     */
+    public function doNotSortWhenConditionIsNotMet()
+    {
+        $triggerNode = $this->createNode('trigger-node', ['title' => 'New Article']);
+        $this->assertCount(0, $this->node->getChildNodes('PunktDe.Archivist.HierarchyNode'));
+        
+        $triggerNode->setProperty('date', new \DateTime('2018-01-19'));
+        $this->assertEquals($this->nodeContextPath . '/2018/1/trigger-node', $triggerNode->getPath());
     }
 
     /**
