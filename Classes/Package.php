@@ -22,7 +22,7 @@ class Package extends BasePackage
     public function boot(Bootstrap $bootstrap)
     {
         $dispatcher = $bootstrap->getSignalSlotDispatcher();
-        $dispatcher->connect(Node::class, 'nodeAdded', NodeSignalInterceptor::class, 'nodeAdded');
-        $dispatcher->connect(Node::class, 'nodePropertyChanged', NodeSignalInterceptor::class, 'nodePropertyChanged');
+        $dispatcher->connect(Node::class, 'afterNodeCreate', NodeSignalInterceptor::class, 'afterNodeCreate');
+        $dispatcher->connect(Node::class, 'nodeUpdated', NodeSignalInterceptor::class, 'nodeUpdated');
     }
 }

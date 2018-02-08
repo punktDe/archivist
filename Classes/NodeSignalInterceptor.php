@@ -27,7 +27,7 @@ class NodeSignalInterceptor
     /**
      * @param NodeInterface $node
      */
-    public function nodeAdded(NodeInterface $node) {
+    public function afterNodeCreate(NodeInterface $node) {
         if(!array_key_exists($node->getNodeType()->getName(), $this->sortingInstructions)) {
             return;
         }
@@ -37,11 +37,8 @@ class NodeSignalInterceptor
 
     /**
      * @param NodeInterface $node
-     * @param string $propertyName
-     * @param $oldValue
-     * @param $value
      */
-    public function nodePropertyChanged(NodeInterface $node, string $propertyName, $oldValue, $value) {
+    public function nodeUpdated(NodeInterface $node) {
         if(!array_key_exists($node->getNodeType()->getName(), $this->sortingInstructions)) {
             return;
         }

@@ -86,7 +86,7 @@ class Archivist
 
             if($affectedNode->getParent() !== $hierarchyNode) {
                 $affectedNode->moveInto($hierarchyNode);
-                $this->logger->log(sprintf('Moved node %s into hierarchy node %s', $affectedNode->getNodeType()->getName(), $hierarchyNode->getNodeType()->getName()), LOG_DEBUG);
+                $this->logger->log(sprintf('Moved affected node %s to path %s', $affectedNode->getNodeType()->getName(), $affectedNode->getPath()), LOG_DEBUG);
             }
 
             if (isset($sortingInstructions['sorting'])) {
