@@ -14,8 +14,8 @@ use Neos\ContentRepository\Domain\Model\NodeInterface;
 use Neos\Flow\Annotations as Flow;
 
 /**
-* @Flow\Scope("singleton")
-*/
+ * @Flow\Scope("singleton")
+ */
 class NodeSignalInterceptor
 {
     /**
@@ -25,24 +25,44 @@ class NodeSignalInterceptor
     protected $sortingInstructions = [];
 
     /**
+     * @var Archivist
+     */
+    protected $archivist = null;
+
+    /**
      * @param NodeInterface $node
      */
-    public function nodeAdded(NodeInterface $node) {
-        if(!array_key_exists($node->getNodeType()->getName(), $this->sortingInstructions)) {
+    public function nodeAdded(NodeInterface $node)
+    {
+        if (!array_key_exists($node->getNodeType()->getName(), $this->sortingInstructions)) {
             return;
         }
 
-        (new Archivist())->organizeNode($node, $this->sortingInstructions[$node->getNodeType()->getName()]);
+        $this->createArchivist()->organizeNode($node, $this->sortingInstructions[$node->getNodeType()->getName()]);
     }
 
     /**
      * @param NodeInterface $node
      */
-    public function nodeUpdated(NodeInterface $node) {
-        if(!array_key_exists($node->getNodeType()->getName(), $this->sortingInstructions)) {
+    public function nodeUpdated(NodeInterface $node)
+    {
+        if($this->createArchivist()->restorePathIfOrganizedDuringThisRequest($node)) {
             return;
         }
 
-        (new Archivist())->organizeNode($node, $this->sortingInstructions[$node->getNodeType()->getName()]);
+        if (array_key_exists($node->getNodeType()->getName(), $this->sortingInstructions)) {
+            $this->createArchivist()->organizeNode($node, $this->sortingInstructions[$node->getNodeType()->getName()]);
+        }
+    }
+
+    /**
+     * @return Archivist
+     */
+    protected function createArchivist(): Archivist
+    {
+        if ($this->archivist === null) {
+            $this->archivist = new Archivist();
+        }
+        return $this->archivist;
     }
 }

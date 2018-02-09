@@ -57,6 +57,11 @@ class Archivist
     protected $context;
 
     /**
+     * @var array
+     */
+    protected $organizedNodeParents = [];
+
+    /**
      * @param NodeInterface $triggeringNode
      * @param array $sortingInstructions
      */
@@ -64,6 +69,7 @@ class Archivist
     {
         if (isset($sortingInstructions['affectedNode'])) {
             $affectedNode = $this->eelEvaluationService->evaluate($sortingInstructions['affectedNode'], ['node' => $triggeringNode]);
+
             if (!($affectedNode instanceof NodeInterface)) {
                 $this->logger->log(sprintf('A node of type %s (%s) triggered node organization but the affectedNode was not found.', $triggeringNode->getNodeType()->getName(), $triggeringNode->getIdentifier()));
                 return;
@@ -74,7 +80,7 @@ class Archivist
 
         $this->nodeDataRepository->persistEntities();
 
-        $this->logger->log(sprintf('Organizing node of type %s with path %s', $triggeringNode->getNodeType()->getName(), $triggeringNode->getPath()), LOG_DEBUG);
+        $this->logger->log(sprintf('Organizing node of type %s with path %s', $affectedNode->getNodeType()->getName(), $affectedNode->getPath()), LOG_DEBUG);
         $context = $this->buildBaseContext($triggeringNode, $sortingInstructions);
 
         if (isset($sortingInstructions['context']) && is_array($sortingInstructions['context'])) {
@@ -84,8 +90,11 @@ class Archivist
         if (isset($sortingInstructions['hierarchy']) && is_array($sortingInstructions['hierarchy'])) {
             $hierarchyNode = $this->hierarchyService->buildHierarchy($sortingInstructions['hierarchy'], $context);
 
-            if($affectedNode->getParent() !== $hierarchyNode) {
+            if ($affectedNode->getParent() !== $hierarchyNode) {
                 $affectedNode->moveInto($hierarchyNode);
+
+                $this->organizedNodeParents[$affectedNode->getIdentifier()] = $affectedNode->getParent();
+
                 $this->logger->log(sprintf('Moved affected node %s to path %s', $affectedNode->getNodeType()->getName(), $affectedNode->getPath()), LOG_DEBUG);
             }
 
@@ -93,6 +102,25 @@ class Archivist
                 $this->sortingService->sortChildren($hierarchyNode, $sortingInstructions['sorting'], null);
             }
         }
+
+    }
+
+    /**
+     * @param NodeInterface $node
+     * @return bool
+     */
+    public function restorePathIfOrganizedDuringThisRequest(NodeInterface $node): bool
+    {
+        if (isset($this->organizedNodeParents[$node->getIdentifier()])) {
+            if ($node->getParent() === $this->organizedNodeParents[$node->getIdentifier()]) {
+                return true;
+            }
+
+            $node->moveInto($this->organizedNodeParents[$node->getIdentifier()]);
+            $this->logger->log(sprintf('Path of affected node %s was restored', $node->getPath()), LOG_DEBUG);
+            return true;
+        }
+        return false;
     }
 
     /**

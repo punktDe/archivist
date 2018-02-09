@@ -133,19 +133,6 @@ class ArchivistTest extends AbstractNodeTest
         $this->assertSame($triggerNode2, $childNodes[1]);
     }
 
-    /**
-     * @test
-     */
-    public function changedPropertyTriggersNodeReSorting()
-    {
-        $triggerNode = $this->createNode('trigger-node', ['title' => 'Node 1', 'date' => new \DateTime('2018-01-19')]);
-        $expectedPath = $this->node->getPath() . '/2018/1/trigger-node';
-        $this->assertEquals($expectedPath, $triggerNode->getPath());
-
-        $triggerNode->setProperty('date', new \DateTime('2018-02-04'));
-        $expectedPath = $this->node->getPath() . '/2018/2/trigger-node';
-        $this->assertEquals($expectedPath, $triggerNode->getPath());
-    }
 
     /**
      * @test
@@ -156,10 +143,25 @@ class ArchivistTest extends AbstractNodeTest
         $triggerNode = $affectedDocumentNode->createNode('trigger-node', $this->nodeTypeManager->getNodeType('PunktDe.Archivist.TriggerContentNode'));
         $triggerNode->setProperty('title', 'ABC');
         $this->assertEquals('A', $affectedDocumentNode->getParent()->getProperty('title'));
-
-        $triggerNode->setProperty('title', 'BCD');
-        $this->assertEquals('B', $affectedDocumentNode->getParent()->getProperty('title'));
     }
+
+    /**
+     * @test
+     */
+    public function documentNodeIsSortedByTriggeringContentNodeAndDocumentIsMovedAfterwards() {
+        $unaffectedNode = $this->createNode('unaffect-node', ['title' => 'an unaffected node'], 'Neos.ContentRepository.Testing:Document');
+        $affectedDocumentNode = $this->createNode('affected-node', ['title' => 'theTitle'], 'Neos.ContentRepository.Testing:Document');
+
+        $triggerNode = $affectedDocumentNode->createNode('trigger-node', $this->nodeTypeManager->getNodeType('PunktDe.Archivist.TriggerContentNode'));
+        $triggerNode->setProperty('title', 'ABC');
+
+        $this->assertEquals('A', $affectedDocumentNode->getParent()->getProperty('title'));
+
+        // Archiver needs to detect, that neos moved the document node and reverts that
+        $affectedDocumentNode->moveAfter($unaffectedNode);
+        $this->assertEquals('A', $affectedDocumentNode->getParent()->getProperty('title'));
+    }
+
 
     /**
      * @param string $nodeName
