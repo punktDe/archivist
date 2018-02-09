@@ -1,4 +1,5 @@
 <?php
+
 namespace PunktDe\Archivist;
 
 /*
@@ -62,6 +63,12 @@ class Archivist
      */
     public function organizeNode(NodeInterface $triggeringNode, array $sortingInstructions)
     {
+        if (isset($sortingInstructions['condition'])) {
+            $condition = $this->eelEvaluationService->evaluate($sortingInstructions['condition'], ['node' => $triggeringNode]);
+            if ($condition !== true) {
+                return;
+            }
+        }
         if (isset($sortingInstructions['affectedNode'])) {
             $affectedNode = $this->eelEvaluationService->evaluate($sortingInstructions['affectedNode'], ['node' => $triggeringNode]);
             if (!($affectedNode instanceof NodeInterface)) {
@@ -84,7 +91,7 @@ class Archivist
         if (isset($sortingInstructions['hierarchy']) && is_array($sortingInstructions['hierarchy'])) {
             $hierarchyNode = $this->hierarchyService->buildHierarchy($sortingInstructions['hierarchy'], $context);
 
-            if($affectedNode->getParent() !== $hierarchyNode) {
+            if ($affectedNode->getParent() !== $hierarchyNode) {
                 $affectedNode->moveInto($hierarchyNode);
                 $this->logger->log(sprintf('Moved affected node %s to path %s', $affectedNode->getNodeType()->getName(), $affectedNode->getPath()), LOG_DEBUG);
             }
