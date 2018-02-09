@@ -36,6 +36,9 @@ PunktDe:
         # or an eel expression like seen below
         sorting: title
 
+        # Optional: Trigger sorting only, when condition is met. Can be used to make sure that required properties are set as expected.
+        condition: "${node.properties.date != null}"
+
         # In the context is evaluated first. You can define variables here which you can use in
         # the remaining configuration
         context:
