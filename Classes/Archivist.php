@@ -74,7 +74,7 @@ class Archivist
 
         $this->nodeDataRepository->persistEntities();
 
-        $this->logger->log(sprintf('Organize node of type %s with path %s', $triggeringNode->getNodeType()->getName(), $triggeringNode->getPath()), LOG_DEBUG);
+        $this->logger->log(sprintf('Organizing node of type %s with path %s', $triggeringNode->getNodeType()->getName(), $triggeringNode->getPath()), LOG_DEBUG);
         $context = $this->buildBaseContext($triggeringNode, $sortingInstructions);
 
         if (isset($sortingInstructions['context']) && is_array($sortingInstructions['context'])) {

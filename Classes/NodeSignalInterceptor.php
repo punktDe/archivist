@@ -27,7 +27,7 @@ class NodeSignalInterceptor
     /**
      * @param NodeInterface $node
      */
-    public function afterNodeCreate(NodeInterface $node) {
+    public function nodeAdded(NodeInterface $node) {
         if(!array_key_exists($node->getNodeType()->getName(), $this->sortingInstructions)) {
             return;
         }

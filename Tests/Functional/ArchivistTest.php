@@ -45,7 +45,9 @@ class ArchivistTest extends AbstractNodeTest
         $newNode = $this->createNode('trigger-node', ['title' => 'New Article', 'date' => new \DateTime('2018-01-19')]);
 
         // The hierarchy is created
-        $lvl1 = $this->node->getChildNodes('PunktDe.Archivist.HierarchyNode')[0];
+        $lvl1ChildNodes = $this->node->getChildNodes('PunktDe.Archivist.HierarchyNode');
+        $this->assertCount(1, $lvl1ChildNodes);
+        $lvl1 =$lvl1ChildNodes[0];
         $this->assertInstanceOf(NodeInterface::class, $lvl1);
         $this->assertEquals('2018', $lvl1->getProperty('title'));
 
@@ -104,6 +106,7 @@ class ArchivistTest extends AbstractNodeTest
         $this->createNode('trigger-node1', ['title' => 'Node 1', 'date' => new \DateTime('2018-01-19')]);
 
         $triggerNodes = (new FlowQuery([$this->node]))->find('[instanceof PunktDe.Archivist.TriggerNode]')->get();
+        $this->assertCount(2, $triggerNodes);
 
         $this->assertEquals('Node 1', $triggerNodes[0]->getProperty('title'));
         $this->assertEquals('Node 2', $triggerNodes[1]->getProperty('title'));
