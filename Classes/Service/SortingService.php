@@ -63,14 +63,14 @@ class SortingService
             foreach ($nodes as $nodeB) {
                 if ($this->eelEvaluationService->evaluate($eelExpression, ['a' => $nodeA, 'b' => $nodeB])) {
                     $object = $nodeB;
-                    break;
+                    if ($object !== null && $nodeA !== $object) {
+                        $this->logger->log(sprintf('Moving node %s before %s', $nodeA->getPath(), $object->getPath()), LOG_DEBUG);
+                        $nodeA->moveBefore($object);
+                        break;
+                    }
                 }
             }
         }
 
-        if ($object !== null && $nodeA !== $object) {
-            $this->logger->log(sprintf('Moving node %s before %s', $nodeA->getPath(), $object->getPath()), LOG_DEBUG);
-            $nodeA->moveBefore($object);
-        }
     }
 }
