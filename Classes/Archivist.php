@@ -63,6 +63,11 @@ class Archivist
     protected $organizedNodeParents = [];
 
     /**
+     * @var array
+     */
+    protected $sortedNodeInstructions = [];
+
+    /**
      * @param NodeInterface $triggeringNode
      * @param array $sortingInstructions
      */
@@ -99,17 +104,15 @@ class Archivist
 
             if ($affectedNode->getParent() !== $hierarchyNode) {
                 $affectedNode->moveInto($hierarchyNode);
-
                 $this->organizedNodeParents[$affectedNode->getIdentifier()] = $affectedNode->getParent();
 
                 $this->logger->log(sprintf('Moved affected node %s to path %s', $affectedNode->getNodeType()->getName(), $affectedNode->getPath()), LOG_DEBUG);
             }
-
-            if (isset($sortingInstructions['sorting'])) {
-                $this->sortingService->sortChildren($hierarchyNode, $sortingInstructions['sorting'], null);
-            }
         }
-
+        if (isset($sortingInstructions['sorting'])) {
+            $this->sortingService->sortChildren($affectedNode->getParent(), $sortingInstructions['sorting'], null);
+            $this->sortedNodeInstructions[$affectedNode->getIdentifier()] = $sortingInstructions['sorting'];
+        }
     }
 
     /**
@@ -125,6 +128,10 @@ class Archivist
 
             $node->moveInto($this->organizedNodeParents[$node->getIdentifier()]);
             $this->logger->log(sprintf('Path of affected node %s was restored', $node->getPath()), LOG_DEBUG);
+            return true;
+        }
+        if (isset($this->sortedNodeInstructions[$node->getIdentifier()])) {
+            $this->sortingService->sortChildren($node->getParent(), $this->sortedNodeInstructions[$node->getIdentifier()] , null);
             return true;
         }
         return false;
