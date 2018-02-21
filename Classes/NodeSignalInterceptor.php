@@ -31,6 +31,7 @@ class NodeSignalInterceptor
 
     /**
      * @param NodeInterface $node
+     * @throws Exception\ArchivistConfigurationException
      */
     public function nodeAdded(NodeInterface $node)
     {
@@ -43,9 +44,14 @@ class NodeSignalInterceptor
 
     /**
      * @param NodeInterface $node
+     * @throws Exception\ArchivistConfigurationException
      */
     public function nodeUpdated(NodeInterface $node)
     {
+        if($this->createArchivist()->isNodeInProcess($node)) {
+            return;
+        }
+
         if($this->createArchivist()->restorePathIfOrganizedDuringThisRequest($node)) {
             return;
         }

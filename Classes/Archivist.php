@@ -63,8 +63,14 @@ class Archivist
     protected $organizedNodeParents = [];
 
     /**
+     * @var array
+     */
+    protected $nodesInProcessing = [];
+
+    /**
      * @param NodeInterface $triggeringNode
      * @param array $sortingInstructions
+     * @throws ArchivistConfigurationException
      */
     public function organizeNode(NodeInterface $triggeringNode, array $sortingInstructions)
     {
@@ -85,6 +91,7 @@ class Archivist
             $affectedNode = $triggeringNode;
         }
 
+        $this->lockNodeForProcessing($affectedNode);
         $this->nodeDataRepository->persistEntities();
 
         $this->logger->log(sprintf('Organizing node of type %s with path %s', $affectedNode->getNodeType()->getName(), $affectedNode->getPath()), LOG_DEBUG);
@@ -110,6 +117,7 @@ class Archivist
             }
         }
 
+        $this->releaseNodeProcessingLock($affectedNode);
     }
 
     /**
@@ -128,6 +136,28 @@ class Archivist
             return true;
         }
         return false;
+    }
+
+    /**
+     * @param NodeInterface $node
+     * @return bool
+     */
+    public function isNodeInProcess(NodeInterface $node) {
+        return isset($this->nodesInProcessing[$node->getIdentifier()]);
+    }
+
+    /**
+     * @param NodeInterface $node
+     */
+    protected function lockNodeForProcessing(NodeInterface $node) {
+        $this->nodesInProcessing[$node->getIdentifier()] = true;
+    }
+
+    /**
+     * @param NodeInterface $node
+     */
+    protected function releaseNodeProcessingLock(NodeInterface $node) {
+        unset($this->nodesInProcessing[$node->getIdentifier()]);
     }
 
     /**
