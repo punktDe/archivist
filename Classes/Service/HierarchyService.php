@@ -59,6 +59,8 @@ class HierarchyService
      * @param array $hierarchyConfiguration
      * @param array $context
      * @return NodeInterface
+     * @throws ArchivistConfigurationException
+     * @throws \Neos\ContentRepository\Exception\NodeTypeNotFoundException
      */
     public function buildHierarchy(array $hierarchyConfiguration, array $context): NodeInterface
     {
@@ -78,6 +80,7 @@ class HierarchyService
      * @param array $context
      * @return NodeInterface The created or found hierarchy node
      * @throws ArchivistConfigurationException
+     * @throws \Neos\ContentRepository\Exception\NodeTypeNotFoundException
      */
     protected function buildHierarchyLevel(NodeInterface $parentNode, array $hierarchyLevelConfiguration, array $context): NodeInterface
     {
@@ -156,7 +159,7 @@ class HierarchyService
      * @param NodeInterface $parentNode
      * @param array $hierarchyLevelConfiguration
      * @param array $context
-     * @return null
+     * @return NodeInterface|null
      * @throws ArchivistConfigurationException
      */
     protected function findExistingHierarchyNode(NodeInterface $parentNode, array $hierarchyLevelConfiguration, array $context)
@@ -171,7 +174,13 @@ class HierarchyService
         }
         $identifyingProperty = $hierarchyLevelConfiguration['properties'][$identifyingPropertyName];
 
+        $this->nodeDataRepository->persistEntities();
+
         $identifyingValue = $this->eelEvaluationService->evaluateIfValidEelExpression($identifyingProperty, $context);
+
+        if ($identifyingPropertyName === 'name') {
+            return $parentNode->getNode($identifyingValue);
+        }
 
         return (new FlowQuery([$parentNode]))->children(sprintf('[instanceof %s][%s = "%s"]', $hierarchyLevelConfiguration['type'], $identifyingPropertyName, $identifyingValue))->get(0);
     }

@@ -76,3 +76,25 @@ PunktDe:
             properties:
               name: "${String.charAt(node.properties.title, 0)}"
               title: "${String.charAt(node.properties.title, 0)}"
+
+      # Example sorting content nodes into document nodes
+      #
+      # A content node triggers the move of its parent document node. For example, you have a
+      # title node which should be considered to move the page.
+      'PunktDe.Archivist.TriggerContentNodeToBeSortedInDocument':
+
+        # The query selecting the root node of the automatically created hierarchy
+        hierarchyRoot: "${q(site).find('[instanceof Neos.ContentRepository.Testing:Page]').get(0)}"
+
+        # Definition of the auto-generated hierarchy
+        hierarchy:
+          -
+            type: 'PunktDe.Archivist.HierarchyNode'
+            properties:
+              name: "${String.charAt(node.properties.title, 0)}"
+              title: "${String.charAt(node.properties.title, 0)}"
+          -
+            type: 'Neos.Neos:ContentCollection'
+            properties:
+              name: 'main'
+            identity: name
