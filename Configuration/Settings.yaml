@@ -1,0 +1,4 @@
+Neos:
+  Fusion:
+    defaultContext:
+      Archivist: 'PunktDe\Archivist\Eel\ArchivistHelper'

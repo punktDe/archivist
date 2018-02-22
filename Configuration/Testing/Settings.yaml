@@ -74,8 +74,8 @@ PunktDe:
 
             # Properties of the new created node.
             properties:
-              name: "${String.charAt(node.properties.title, 0)}"
-              title: "${String.charAt(node.properties.title, 0)}"
+              name: "${Archivist.buildSortingCharacter(node.properties.title)}"
+              title: "${Archivist.buildSortingCharacter(node.properties.title)}"
 
       # Example sorting content nodes into document nodes
       #
@@ -91,8 +91,8 @@ PunktDe:
           -
             type: 'PunktDe.Archivist.HierarchyNode'
             properties:
-              name: "${String.charAt(node.properties.title, 0)}"
-              title: "${String.charAt(node.properties.title, 0)}"
+              name: "${Archivist.buildSortingCharacter(node.properties.title)}"
+              title: "${Archivist.buildSortingCharacter(node.properties.title)}"
           -
             type: 'Neos.Neos:ContentCollection'
             properties:

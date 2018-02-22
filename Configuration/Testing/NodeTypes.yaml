@@ -8,7 +8,7 @@
       constraints:
         nodeTypes:
           '*': true
-          
+
 'PunktDe.Archivist.TriggerNode':
   superTypes:
     'Neos.ContentRepository.Testing:Document': true

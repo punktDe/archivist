@@ -99,5 +99,9 @@ title node which should be considered to move the page.
     
                 # Properties of the new created node.
                 properties:
-                  name: "${String.charAt(node.properties.title, 0)}"
-                  title: "${String.charAt(node.properties.title, 0)}"
+                  name: "${Archivist.buildSortingCharacter(title)}"
+                  title: "${Archivist.buildSortingCharacter(title)}"
+
+## Archivist Eel Helper
+
+`Archivist.buildSortingCharacter(string)` Generates an upper case sorting character from the given string. 
