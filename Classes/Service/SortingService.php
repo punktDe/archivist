@@ -40,7 +40,7 @@ class SortingService
         if ($this->eelEvaluationService->isValidExpression($eelOrProperty)) {
             $eelExpression = $eelOrProperty;
         } else {
-            $eelExpression = sprintf('${q(a).property("%s") < q(b).property("%s")}', $eelOrProperty, $eelOrProperty);
+            $eelExpression = sprintf('${String.toLowerCase(q(a).property("%s")) < String.toLowerCase(q(b).property("%s"))}', $eelOrProperty, $eelOrProperty);
         }
         $this->sortChildNodesByEelExpression($parentNode, $eelExpression, $nodeTypeFilter);
     }
