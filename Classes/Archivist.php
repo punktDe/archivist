@@ -1,5 +1,4 @@
 <?php
-
 namespace PunktDe\Archivist;
 
 /*
@@ -65,12 +64,18 @@ class Archivist
     /**
      * @var array
      */
+    protected $sortedNodeInstructions = [];
+
+    /**
+     * @var array
+     */
     protected $nodesInProcessing = [];
 
     /**
      * @param NodeInterface $triggeringNode
      * @param array $sortingInstructions
      * @throws ArchivistConfigurationException
+     * @throws \Neos\ContentRepository\Exception\NodeTypeNotFoundException
      */
     public function organizeNode(NodeInterface $triggeringNode, array $sortingInstructions)
     {
@@ -111,16 +116,27 @@ class Archivist
 
                 $this->logger->log(sprintf('Moved affected node %s to path %s', $affectedNode->getNodeType()->getName(), $affectedNode->getPath()), LOG_DEBUG);
             }
+        }
 
-            if (isset($sortingInstructions['sorting'])) {
-                $this->sortingService->sortChildren($hierarchyNode, $sortingInstructions['sorting'], null);
-            }
+        if (isset($sortingInstructions['sorting'])) {
+            $this->sortingService->sortChildren($affectedNode->getParent(), $sortingInstructions['sorting'], null);
+            $this->sortedNodeInstructions[$affectedNode->getIdentifier()] = $sortingInstructions['sorting'];
         }
 
         $this->releaseNodeProcessingLock($affectedNode);
     }
 
     /**
+     * On actions like createAfter, the following happens
+     *
+     * 1. save the parent
+     * 2. createInto parent
+     * --- Archivist creates the hierarchy and moves / sorts the node
+     * 3. move node after the parent
+     *
+     * The second move is done to the affected node. When we use a triggered node and an affected node we cannot catch that signal.
+     * So we need to move the node again to the originally calculated position.
+     *
      * @param NodeInterface $node
      * @return bool
      */
@@ -135,6 +151,12 @@ class Archivist
             $this->logger->log(sprintf('Path of affected node %s was restored', $node->getPath()), LOG_DEBUG);
             return true;
         }
+
+        if (isset($this->sortedNodeInstructions[$node->getIdentifier()])) {
+            $this->sortingService->sortChildren($node->getParent(), $this->sortedNodeInstructions[$node->getIdentifier()] , null);
+            return true;
+        }
+
         return false;
     }
 
