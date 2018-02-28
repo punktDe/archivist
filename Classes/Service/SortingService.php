@@ -54,23 +54,20 @@ class SortingService
     protected function sortChildNodesByEelExpression(NodeInterface $parenNode, string $eelExpression, $nodeTypeFilter)
     {
         $nodes = $parenNode->getChildNodes($nodeTypeFilter);
-        $object = null;
 
         foreach ($nodes as $nodeA) {
-            /** @var NodeInterface $nodeA */
-            $object = null;
+
             /** @var NodeInterface $nodeB */
             foreach ($nodes as $nodeB) {
                 if ($this->eelEvaluationService->evaluate($eelExpression, ['a' => $nodeA, 'b' => $nodeB])) {
-                    $object = $nodeB;
-                    break;
+
+                    if ($nodeB !== $nodeA) {
+                        $this->logger->log(sprintf('Moving node %s before %s', $nodeA->getPath(), $nodeB->getPath()), LOG_DEBUG);
+                        $nodeA->moveBefore($nodeB);
+                        break;
+                    }
                 }
             }
-        }
-
-        if ($object !== null && $nodeA !== $object) {
-            $this->logger->log(sprintf('Moving node %s before %s', $nodeA->getPath(), $object->getPath()), LOG_DEBUG);
-            $nodeA->moveBefore($object);
         }
     }
 }
