@@ -119,7 +119,7 @@ class Archivist
         }
 
         if (isset($sortingInstructions['sorting'])) {
-            $this->sortingService->sortChildren($affectedNode->getParent(), $sortingInstructions['sorting'], null);
+            $this->sortingService->sortChildren($affectedNode, $sortingInstructions['sorting'], null);
             $this->sortedNodeInstructions[$affectedNode->getIdentifier()] = $sortingInstructions['sorting'];
         }
 
@@ -153,7 +153,7 @@ class Archivist
         }
 
         if (isset($this->sortedNodeInstructions[$node->getIdentifier()])) {
-            $this->sortingService->sortChildren($node->getParent(), $this->sortedNodeInstructions[$node->getIdentifier()] , null);
+            $this->sortingService->sortChildren($node, $this->sortedNodeInstructions[$node->getIdentifier()] , null);
             return true;
         }
 

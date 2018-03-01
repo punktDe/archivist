@@ -31,42 +31,33 @@ class SortingService
     protected $logger;
 
     /**
-     * @param NodeInterface $parentNode
+     * @param NodeInterface $node
      * @param string $eelOrProperty
      * @param string $nodeTypeFilter
      */
-    public function sortChildren(NodeInterface $parentNode, string $eelOrProperty, $nodeTypeFilter)
+    public function sortChildren(NodeInterface $node, string $eelOrProperty, $nodeTypeFilter)
     {
         if ($this->eelEvaluationService->isValidExpression($eelOrProperty)) {
             $eelExpression = $eelOrProperty;
         } else {
             $eelExpression = sprintf('${String.toLowerCase(q(a).property("%s")) < String.toLowerCase(q(b).property("%s"))}', $eelOrProperty, $eelOrProperty);
         }
-        $this->sortChildNodesByEelExpression($parentNode, $eelExpression, $nodeTypeFilter);
+
+        $this->moveNodeToCorrectPosition($node, $eelExpression, $nodeTypeFilter);
     }
 
     /**
-     * @param NodeInterface $parenNode
+     * @param NodeInterface $nodeToBeSorted
      * @param string $eelExpression
-     * @param string $nodeTypeFilter
-     * @return void
+     * @param $nodeTypeFilter
      */
-    protected function sortChildNodesByEelExpression(NodeInterface $parenNode, string $eelExpression, $nodeTypeFilter)
-    {
-        $nodes = $parenNode->getChildNodes($nodeTypeFilter);
+    protected function moveNodeToCorrectPosition(NodeInterface $nodeToBeSorted, string $eelExpression, $nodeTypeFilter) {
+        $nodes = $nodeToBeSorted->getParent()->getChildNodes($nodeTypeFilter);
 
-        foreach ($nodes as $nodeA) {
-
-            /** @var NodeInterface $nodeB */
-            foreach ($nodes as $nodeB) {
-                if ($this->eelEvaluationService->evaluate($eelExpression, ['a' => $nodeA, 'b' => $nodeB])) {
-
-                    if ($nodeB !== $nodeA) {
-                        $this->logger->log(sprintf('Moving node %s before %s', $nodeA->getPath(), $nodeB->getPath()), LOG_DEBUG);
-                        $nodeA->moveBefore($nodeB);
-                        break;
-                    }
-                }
+        foreach ($nodes as $node) {
+            if ($this->eelEvaluationService->evaluate($eelExpression, ['a' => $nodeToBeSorted, 'b' => $node])) {
+                $nodeToBeSorted->moveBefore($node);
+                break;
             }
         }
     }
