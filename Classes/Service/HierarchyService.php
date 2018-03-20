@@ -97,23 +97,25 @@ class HierarchyService
             return $existingNode;
         }
 
+        $hierarchyLevelNodeTemplate = new NodeTemplate();
+        $hierarchyLevelNodeTemplate->setNodeType($hierarchyLevelNodeType);
+
         if (isset($hierarchyLevelConfiguration['properties']['name'])) {
             $hierarchyLevelNodeName = (string)$this->eelEvaluationService->evaluateIfValidEelExpression($hierarchyLevelConfiguration['properties']['name'], $context);
+            $hierarchyLevelNodeTemplate->setName(NodeUtility::renderValidNodeName($hierarchyLevelNodeName));
+            unset($hierarchyLevelConfiguration['properties']['name']);
         }
 
         if ($hierarchyLevelNodeName === '') {
             return $parentNode;
         }
 
-        $hierarchyLevelNodeTemplate = new NodeTemplate();
-        $hierarchyLevelNodeTemplate->setNodeType($hierarchyLevelNodeType);
-
         if (isset($hierarchyLevelConfiguration['properties'])) {
             $this->applyProperties($hierarchyLevelNodeTemplate, $hierarchyLevelConfiguration['properties'], $context);
         }
 
         if ($hierarchyLevelNodeType->isOfType('Neos.Neos:Document') && !isset($this->properties['uriPathSegment'])) {
-            $hierarchyLevelNodeTemplate->setProperty('uriPathSegment', NodeUtility::renderValidNodeName($hierarchyLevelNodeTemplate->getName()));
+            $hierarchyLevelNodeTemplate->setProperty('uriPathSegment', $hierarchyLevelNodeTemplate->getName());
         }
 
         $hierarchyLevelNode = $parentNode->createNodeFromTemplate($hierarchyLevelNodeTemplate, $hierarchyLevelNodeName);
