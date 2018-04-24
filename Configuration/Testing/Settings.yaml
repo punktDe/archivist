@@ -43,7 +43,7 @@ PunktDe:
           -
             type: 'PunktDe.Archivist.HierarchyNode'
             properties:
-              name: "${Date.format(publishDate)}"
+              name: "${Date.month(publishDate)}"
               title: "${Date.month(publishDate)}"
             identity: title
 
