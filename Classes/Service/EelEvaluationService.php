@@ -10,6 +10,7 @@ namespace PunktDe\Archivist\Service;
  */
 
 use Neos\Eel\EelEvaluatorInterface;
+use Neos\Eel\Exception;
 use Neos\Eel\Package;
 use Neos\Eel\Utility;
 use Neos\Flow\Annotations as Flow;
@@ -35,6 +36,7 @@ final class EelEvaluationService
      * @param string $expression
      * @param array $context
      * @return mixed|string
+     * @throws Exception
      */
     public function evaluateIfValidEelExpression(string $expression, array $context)
     {
@@ -58,6 +60,7 @@ final class EelEvaluationService
      * @param string $expression
      * @param array $context
      * @return mixed
+     * @throws Exception
      */
     public function evaluate(string $expression, array $context)
     {
