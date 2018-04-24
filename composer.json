@@ -18,6 +18,9 @@
     "extra": {
         "neos": {
             "package-key": "PunktDe.Archivist"
-        }
+        },
+        "applied-flow-migrations": [
+            "TYPO3.FLOW3-201201261636"
+        ]
     }
 }
