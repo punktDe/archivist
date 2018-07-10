@@ -123,8 +123,10 @@ class HierarchyService
         $this->logger->log(sprintf('Built hierarchy level on path %s with node type %s ', $hierarchyLevelNode->getPath(), $hierarchyLevelConfiguration['type']), LOG_DEBUG);
 
         if (isset($hierarchyLevelConfiguration['sorting'])) {
-            $this->sortingService->sortChildren($parentNode, $hierarchyLevelConfiguration['sorting'], $hierarchyLevelNodeType->getName());
+            $this->sortingService->sortChildren($hierarchyLevelNode, $hierarchyLevelConfiguration['sorting'], $hierarchyLevelNodeType->getName());
         }
+
+        $this->nodeDataRepository->persistEntities();
 
         return $hierarchyLevelNode;
     }
@@ -133,6 +135,7 @@ class HierarchyService
      * @param NodeTemplate $node
      * @param array $properties
      * @param array $context
+     * @throws \Neos\Eel\Exception
      */
     protected function applyProperties(NodeTemplate $node, array $properties, array $context)
     {
