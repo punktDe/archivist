@@ -31,11 +31,12 @@ class SortingService
     protected $logger;
 
     /**
-     * @param NodeInterface $node
+     * @param NodeInterface $nodeToBeSorted
      * @param string $eelOrProperty
      * @param string $nodeTypeFilter
+     * @throws \Neos\Eel\Exception
      */
-    public function sortChildren(NodeInterface $node, string $eelOrProperty, $nodeTypeFilter)
+    public function sortChildren(NodeInterface $nodeToBeSorted, string $eelOrProperty, $nodeTypeFilter)
     {
         if ($this->eelEvaluationService->isValidExpression($eelOrProperty)) {
             $eelExpression = $eelOrProperty;
@@ -43,15 +44,17 @@ class SortingService
             $eelExpression = sprintf('${String.toLowerCase(q(a).property("%s")) < String.toLowerCase(q(b).property("%s"))}', $eelOrProperty, $eelOrProperty);
         }
 
-        $this->moveNodeToCorrectPosition($node, $eelExpression, $nodeTypeFilter);
+        $this->moveNodeToCorrectPosition($nodeToBeSorted, $eelExpression, $nodeTypeFilter);
     }
 
     /**
      * @param NodeInterface $nodeToBeSorted
      * @param string $eelExpression
      * @param $nodeTypeFilter
+     * @throws \Neos\Eel\Exception
      */
-    protected function moveNodeToCorrectPosition(NodeInterface $nodeToBeSorted, string $eelExpression, $nodeTypeFilter) {
+    protected function moveNodeToCorrectPosition(NodeInterface $nodeToBeSorted, string $eelExpression, $nodeTypeFilter)
+    {
         $nodes = $nodeToBeSorted->getParent()->getChildNodes($nodeTypeFilter);
 
         foreach ($nodes as $node) {

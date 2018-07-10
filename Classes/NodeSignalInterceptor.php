@@ -11,6 +11,7 @@ namespace PunktDe\Archivist;
  */
 
 use Neos\ContentRepository\Domain\Model\NodeInterface;
+use Neos\ContentRepository\Exception\NodeTypeNotFoundException;
 use Neos\Flow\Annotations as Flow;
 
 /**
@@ -32,6 +33,7 @@ class NodeSignalInterceptor
     /**
      * @param NodeInterface $node
      * @throws Exception\ArchivistConfigurationException
+     * @throws NodeTypeNotFoundException
      */
     public function nodeAdded(NodeInterface $node)
     {
@@ -45,6 +47,7 @@ class NodeSignalInterceptor
     /**
      * @param NodeInterface $node
      * @throws Exception\ArchivistConfigurationException
+     * @throws NodeTypeNotFoundException
      */
     public function nodeUpdated(NodeInterface $node)
     {

@@ -76,6 +76,7 @@ class Archivist
      * @param array $sortingInstructions
      * @throws ArchivistConfigurationException
      * @throws \Neos\ContentRepository\Exception\NodeTypeNotFoundException
+     * @throws \Neos\Eel\Exception
      */
     public function organizeNode(NodeInterface $triggeringNode, array $sortingInstructions)
     {
@@ -139,6 +140,7 @@ class Archivist
      *
      * @param NodeInterface $node
      * @return bool
+     * @throws \Neos\Eel\Exception
      */
     public function restorePathIfOrganizedDuringThisRequest(NodeInterface $node): bool
     {
@@ -153,7 +155,7 @@ class Archivist
         }
 
         if (isset($this->sortedNodeInstructions[$node->getIdentifier()])) {
-            $this->sortingService->sortChildren($node, $this->sortedNodeInstructions[$node->getIdentifier()] , null);
+            $this->sortingService->sortChildren($node, $this->sortedNodeInstructions[$node->getIdentifier()], null);
             return true;
         }
 
@@ -164,21 +166,24 @@ class Archivist
      * @param NodeInterface $node
      * @return bool
      */
-    public function isNodeInProcess(NodeInterface $node) {
+    public function isNodeInProcess(NodeInterface $node)
+    {
         return isset($this->nodesInProcessing[$node->getIdentifier()]);
     }
 
     /**
      * @param NodeInterface $node
      */
-    protected function lockNodeForProcessing(NodeInterface $node) {
+    protected function lockNodeForProcessing(NodeInterface $node)
+    {
         $this->nodesInProcessing[$node->getIdentifier()] = true;
     }
 
     /**
      * @param NodeInterface $node
      */
-    protected function releaseNodeProcessingLock(NodeInterface $node) {
+    protected function releaseNodeProcessingLock(NodeInterface $node)
+    {
         unset($this->nodesInProcessing[$node->getIdentifier()]);
     }
 
@@ -187,6 +192,7 @@ class Archivist
      * @param array $sortingInstructions
      * @return array
      * @throws ArchivistConfigurationException
+     * @throws \Neos\Eel\Exception
      */
     protected function buildBaseContext(NodeInterface $node, array $sortingInstructions): array
     {
@@ -214,6 +220,7 @@ class Archivist
      * @param array $baseContext
      * @param array $contextConfiguration
      * @return array
+     * @throws \Neos\Eel\Exception
      */
     protected function buildCustomContext(array $baseContext, array $contextConfiguration): array
     {

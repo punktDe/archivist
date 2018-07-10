@@ -10,6 +10,7 @@ namespace PunktDe\Archivist\Service;
  */
 
 use Neos\ContentRepository\Domain\Repository\NodeDataRepository;
+use Neos\ContentRepository\Exception\NodeTypeNotFoundException;
 use Neos\Flow\Annotations as Flow;
 use Neos\ContentRepository\Domain\Model\NodeInterface;
 use Neos\ContentRepository\Domain\Model\NodeTemplate;
@@ -60,7 +61,8 @@ class HierarchyService
      * @param array $context
      * @return NodeInterface
      * @throws ArchivistConfigurationException
-     * @throws \Neos\ContentRepository\Exception\NodeTypeNotFoundException
+     * @throws NodeTypeNotFoundException
+     * @throws \Neos\Eel\Exception
      */
     public function buildHierarchy(array $hierarchyConfiguration, array $context): NodeInterface
     {
@@ -80,7 +82,8 @@ class HierarchyService
      * @param array $context
      * @return NodeInterface The created or found hierarchy node
      * @throws ArchivistConfigurationException
-     * @throws \Neos\ContentRepository\Exception\NodeTypeNotFoundException
+     * @throws NodeTypeNotFoundException
+     * @throws \Neos\Eel\Exception
      */
     protected function buildHierarchyLevel(NodeInterface $parentNode, array $hierarchyLevelConfiguration, array $context): NodeInterface
     {
@@ -166,8 +169,9 @@ class HierarchyService
      * @param array $context
      * @return NodeInterface|null
      * @throws ArchivistConfigurationException
+     * @throws \Neos\Eel\Exception
      */
-    protected function findExistingHierarchyNode(NodeInterface $parentNode, array $hierarchyLevelConfiguration, array $context)
+    protected function findExistingHierarchyNode(NodeInterface $parentNode, array $hierarchyLevelConfiguration, array $context): ?NodeInterface
     {
         if (!isset($hierarchyLevelConfiguration['identity'])) {
             return null;
