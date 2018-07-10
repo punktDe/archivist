@@ -1,11 +1,11 @@
 language: php
 matrix:
   include:
-    - php: 7.1
+    - php: 7.2
 
 sudo: false
 before_install:
-  - export NEOS_TARGET_VERSION=3.3
+  - export NEOS_TARGET_VERSION=4.0
   - cd ..
   - git clone https://github.com/neos/neos-base-distribution.git -b ${NEOS_TARGET_VERSION}
   - cd neos-base-distribution
