@@ -10,6 +10,7 @@ namespace PunktDe\Archivist\Service;
  */
 
 use Neos\ContentRepository\Domain\Repository\NodeDataRepository;
+use Neos\ContentRepository\Domain\Service\PublishingServiceInterface;
 use Neos\ContentRepository\Exception\NodeTypeNotFoundException;
 use Neos\Flow\Annotations as Flow;
 use Neos\ContentRepository\Domain\Model\NodeInterface;
@@ -52,6 +53,12 @@ class HierarchyService
 
     /**
      * @Flow\Inject
+     * @var PublishingServiceInterface
+     */
+    protected $publishingService;
+
+    /**
+     * @Flow\Inject
      * @var SystemLoggerInterface
      */
     protected $logger;
@@ -59,18 +66,19 @@ class HierarchyService
     /**
      * @param array $hierarchyConfiguration
      * @param array $context
+     * @param bool $publishHierarchy Automatically publish the built hierarchy node to live workspace.
      * @return NodeInterface
      * @throws ArchivistConfigurationException
      * @throws NodeTypeNotFoundException
      * @throws \Neos\Eel\Exception
      */
-    public function buildHierarchy(array $hierarchyConfiguration, array $context): NodeInterface
+    public function buildHierarchy(array $hierarchyConfiguration, array $context, bool $publishHierarchy = false): NodeInterface
     {
         $targetNode = null;
         $parent = $context['hierarchyRoot'];
 
         foreach ($hierarchyConfiguration as $hierarchyLevelConfiguration) {
-            $parent = $this->buildHierarchyLevel($parent, $hierarchyLevelConfiguration, $context);
+            $parent = $this->buildHierarchyLevel($parent, $hierarchyLevelConfiguration, $context, $publishHierarchy);
         }
 
         return $parent;
@@ -80,12 +88,13 @@ class HierarchyService
      * @param NodeInterface $parentNode
      * @param array $hierarchyLevelConfiguration
      * @param array $context
+     * @param bool $publishHierarchy
      * @return NodeInterface The created or found hierarchy node
      * @throws ArchivistConfigurationException
      * @throws NodeTypeNotFoundException
      * @throws \Neos\Eel\Exception
      */
-    protected function buildHierarchyLevel(NodeInterface $parentNode, array $hierarchyLevelConfiguration, array $context): NodeInterface
+    protected function buildHierarchyLevel(NodeInterface $parentNode, array $hierarchyLevelConfiguration, array $context, bool $publishHierarchy): NodeInterface
     {
         $hierarchyLevelNodeName = '';
         $this->evaluateHierarchyLevelConfiguration($hierarchyLevelConfiguration);
@@ -127,6 +136,12 @@ class HierarchyService
 
         if (isset($hierarchyLevelConfiguration['sorting'])) {
             $this->sortingService->sortChildren($hierarchyLevelNode, $hierarchyLevelConfiguration['sorting'], $hierarchyLevelNodeType->getName());
+        }
+
+        if ($publishHierarchy === true) {
+            if ($hierarchyLevelNode->getWorkspace()->isPublicWorkspace() === false) {
+                $this->publishNodeAndChildContent($hierarchyLevelNode);
+            }
         }
 
         $this->nodeDataRepository->persistEntities();
@@ -194,4 +209,20 @@ class HierarchyService
         return (new FlowQuery([$parentNode]))->children(sprintf('[instanceof %s][%s = "%s"]', $hierarchyLevelConfiguration['type'], $identifyingPropertyName, $identifyingValue))->get(0);
     }
 
+    /**
+     * @param NodeInterface $node
+     */
+    protected function publishNodeAndChildContent(NodeInterface $node): void
+    {
+        $contentNodes = $node->getChildNodes('Neos.Neos:Content');
+
+        /** @var NodeInterface $contentNode */
+        foreach ($contentNodes as $contentNode) {
+            if ($contentNode->getWorkspace()->isPublicWorkspace() === false) {
+                $this->publishNodeAndChildContent($contentNode);
+            }
+        }
+
+        $this->publishingService->publishNode($node);
+    }
 }

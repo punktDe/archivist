@@ -19,6 +19,9 @@ PunktDe:
         # Optional: Trigger sorting only, when condition is met. Can be used to make sure that required properties are set as expected.
         condition: "${node.properties.date != null}"
 
+        # Automatically publish the created document hierarchy
+        publishHierarchy: true
+
         # In the context is evaluated first. You can define variables here which you can use in
         # the remaining configuration
         context:

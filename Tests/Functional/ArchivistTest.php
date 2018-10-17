@@ -13,6 +13,9 @@ namespace PunktDe\Archivist\Tests\Functional;
 use Neos\ContentRepository\Domain\Model\NodeInterface;
 use Neos\ContentRepository\Domain\Model\NodeTemplate;
 use Neos\ContentRepository\Domain\Service\NodeTypeManager;
+use Neos\ContentRepository\Exception\NodeException;
+use Neos\ContentRepository\Exception\NodeExistsException;
+use Neos\ContentRepository\Exception\NodeTypeNotFoundException;
 use Neos\ContentRepository\Tests\Functional\AbstractNodeTest;
 use Neos\Eel\Exception;
 use Neos\Eel\FlowQuery\FlowQuery;
@@ -41,7 +44,7 @@ class ArchivistTest extends AbstractNodeTest
 
     /**
      * @test
-     * @throws \Neos\ContentRepository\Exception\NodeTypeNotFoundException
+     * @throws NodeTypeNotFoundException
      */
     public function simpleCreateNode()
     {
@@ -63,10 +66,9 @@ class ArchivistTest extends AbstractNodeTest
         $this->assertEquals($this->nodeContextPath . '/2018/1/trigger-node', $newNode->getPath());
     }
 
-
     /**
      * @test
-     * @throws \Neos\ContentRepository\Exception\NodeTypeNotFoundException
+     * @throws NodeTypeNotFoundException
      */
     public function doNotSortWhenConditionIsNotMet()
     {
@@ -79,7 +81,22 @@ class ArchivistTest extends AbstractNodeTest
 
     /**
      * @test
-     * @throws \Neos\ContentRepository\Exception\NodeTypeNotFoundException
+     * @throws NodeTypeNotFoundException
+     */
+    public function autoPublishingWorksIfConfigured() {
+        $this->createNode('trigger-node1', ['title' => 'New Article', 'date' => new \DateTime('2018-01-19')]);
+        $this->assertCount(1, $this->node->getChildNodes('PunktDe.Archivist.HierarchyNode'));
+
+        $childNodes = $this->node->getChildNodes('PunktDe.Archivist.HierarchyNode');
+        /** @var NodeInterface $hierarchyNode */
+        $hierarchyNode = current($childNodes);
+
+        $this->assertTrue($hierarchyNode->getWorkspace()->isPublicWorkspace());
+    }
+
+    /**
+     * @test
+     * @throws NodeTypeNotFoundException
      */
     public function hierarchyIsNotCreatedTwice()
     {
@@ -91,7 +108,7 @@ class ArchivistTest extends AbstractNodeTest
 
     /**
      * @test
-     * @throws \Neos\ContentRepository\Exception\NodeTypeNotFoundException
+     * @throws NodeTypeNotFoundException
      */
     public function hierarchyNodesAreSortedCorrectlyWithSimpleProperty()
     {
@@ -105,7 +122,8 @@ class ArchivistTest extends AbstractNodeTest
 
     /**
      * @test
-     * @throws \Neos\ContentRepository\Exception\NodeTypeNotFoundException
+     * @throws NodeTypeNotFoundException
+     * @throws Exception
      */
     public function hierarchyNodesAreSortedCorrectlyWithEelExpression()
     {
@@ -119,7 +137,8 @@ class ArchivistTest extends AbstractNodeTest
 
     /**
      * @test
-     * @throws \Neos\ContentRepository\Exception\NodeTypeNotFoundException
+     * @throws NodeTypeNotFoundException
+     * @throws Exception
      */
     public function createdNodesAreSortedCorrectly()
     {
@@ -135,7 +154,8 @@ class ArchivistTest extends AbstractNodeTest
 
     /**
      * @test
-     * @throws \Neos\ContentRepository\Exception\NodeTypeNotFoundException
+     * @throws NodeTypeNotFoundException
+     * @throws Exception
      */
     public function nodesAreSortedIfHierarchyAlreadyExist()
     {
@@ -158,9 +178,9 @@ class ArchivistTest extends AbstractNodeTest
 
     /**
      * @test
-     * @throws \Neos\ContentRepository\Exception\NodeException
-     * @throws \Neos\ContentRepository\Exception\NodeExistsException
-     * @throws \Neos\ContentRepository\Exception\NodeTypeNotFoundException
+     * @throws NodeException
+     * @throws NodeExistsException
+     * @throws NodeTypeNotFoundException
      */
     public function documentNodeIsSortedByTriggeringContentNode()
     {
@@ -172,9 +192,9 @@ class ArchivistTest extends AbstractNodeTest
 
     /**
      * @test
-     * @throws \Neos\ContentRepository\Exception\NodeException
-     * @throws \Neos\ContentRepository\Exception\NodeExistsException
-     * @throws \Neos\ContentRepository\Exception\NodeTypeNotFoundException
+     * @throws NodeException
+     * @throws NodeExistsException
+     * @throws NodeTypeNotFoundException
      */
     public function documentNodeIsSortedByTriggeringContentNodeAndDocumentIsMovedAfterwards() {
         $unaffectedNode = $this->createNode('unaffect-node', ['title' => 'an unaffected node'], 'Neos.ContentRepository.Testing:Document');
@@ -192,7 +212,7 @@ class ArchivistTest extends AbstractNodeTest
 
     /**
      * @test
-     * @throws \Neos\ContentRepository\Exception\NodeTypeNotFoundException
+     * @throws NodeTypeNotFoundException
      */
     public function contentNodeIsSortedInDocument() {
         $triggerNodeType = $this->nodeTypeManager->getNodeType('PunktDe.Archivist.TriggerContentNodeToBeSortedInDocument');
@@ -211,7 +231,7 @@ class ArchivistTest extends AbstractNodeTest
      * @param array $properties
      * @param string $triggerNodeType
      * @return \Neos\ContentRepository\Domain\Model\NodeInterface
-     * @throws \Neos\ContentRepository\Exception\NodeTypeNotFoundException
+     * @throws NodeTypeNotFoundException
      */
     protected function createNode($nodeName = 'trigger-node', array $properties = [], $triggerNodeType = 'PunktDe.Archivist.TriggerNode')
     {

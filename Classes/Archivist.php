@@ -86,6 +86,7 @@ class Archivist
                 return;
             }
         }
+
         if (isset($sortingInstructions['affectedNode'])) {
             $affectedNode = $this->eelEvaluationService->evaluate($sortingInstructions['affectedNode'], ['node' => $triggeringNode]);
 
@@ -108,7 +109,7 @@ class Archivist
         }
 
         if (isset($sortingInstructions['hierarchy']) && is_array($sortingInstructions['hierarchy'])) {
-            $hierarchyNode = $this->hierarchyService->buildHierarchy($sortingInstructions['hierarchy'], $context);
+            $hierarchyNode = $this->hierarchyService->buildHierarchy($sortingInstructions['hierarchy'], $context, $sortingInstructions['publishHierarchy'] ?? false);
 
             if ($affectedNode->getParent() !== $hierarchyNode) {
                 $affectedNode->moveInto($hierarchyNode);
