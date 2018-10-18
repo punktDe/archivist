@@ -44,6 +44,9 @@ PunktDe:
         context:
           publishDate: "${node.properties.date}"
 
+        # Automatically publish the created document hierarchy
+        publishHierarchy: true
+
         # Definition of the auto-generated hierarchy
         hierarchy:
           -

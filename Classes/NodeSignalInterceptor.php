@@ -34,6 +34,7 @@ class NodeSignalInterceptor
      * @param NodeInterface $node
      * @throws Exception\ArchivistConfigurationException
      * @throws NodeTypeNotFoundException
+     * @throws \Neos\Eel\Exception
      */
     public function nodeAdded(NodeInterface $node)
     {
@@ -48,6 +49,7 @@ class NodeSignalInterceptor
      * @param NodeInterface $node
      * @throws Exception\ArchivistConfigurationException
      * @throws NodeTypeNotFoundException
+     * @throws \Neos\Eel\Exception
      */
     public function nodeUpdated(NodeInterface $node)
     {
