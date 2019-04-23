@@ -53,6 +53,18 @@ PunktDe:
             # Simple sorting on a property
             sorting: title
 
+      # Minimal Configuration Example
+      #
+      'PunktDe.Archivist.MinimalConfiguredTriggerNode':
+        hierarchyRoot: "${q(site).find('[instanceof Neos.ContentRepository.Testing:Page]').get(0)}"
+        hierarchy:
+          -
+            type: 'PunktDe.Archivist.HierarchyNode'
+            properties:
+              title: "${Archivist.buildSortingCharacter(node.properties.title)}"
+            identity: title
+            sorting: "${q(a).property('title') < q(b).property('title')}"
+
       # Example triggering content node
       #
       # A content node triggers the move of its parent document node. For example, you have a

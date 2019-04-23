@@ -10,6 +10,7 @@ namespace PunktDe\Archivist\Tests\Functional;
  * source code.
  */
 
+use DateTime;
 use Neos\ContentRepository\Domain\Model\NodeInterface;
 use Neos\ContentRepository\Domain\Model\NodeTemplate;
 use Neos\ContentRepository\Domain\Service\NodeTypeManager;
@@ -48,12 +49,12 @@ class ArchivistTest extends AbstractNodeTest
      */
     public function simpleCreateNode()
     {
-        $newNode = $this->createNode('trigger-node', ['title' => 'New Article', 'date' => new \DateTime('2018-01-19')]);
+        $newNode = $this->createNode('trigger-node', ['title' => 'New Article', 'date' => new DateTime('2018-01-19')]);
 
         // The hierarchy is created
         $lvl1ChildNodes = $this->node->getChildNodes('PunktDe.Archivist.HierarchyNode');
         $this->assertCount(1, $lvl1ChildNodes);
-        $lvl1 =$lvl1ChildNodes[0];
+        $lvl1 = $lvl1ChildNodes[0];
         $this->assertInstanceOf(NodeInterface::class, $lvl1);
         $this->assertEquals('2018', $lvl1->getProperty('title'));
 
@@ -74,8 +75,8 @@ class ArchivistTest extends AbstractNodeTest
     {
         $triggerNode = $this->createNode('trigger-node', ['title' => 'New Article']);
         $this->assertCount(0, $this->node->getChildNodes('PunktDe.Archivist.HierarchyNode'));
-        
-        $triggerNode->setProperty('date', new \DateTime('2018-01-19'));
+
+        $triggerNode->setProperty('date', new DateTime('2018-01-19'));
         $this->assertEquals($this->nodeContextPath . '/2018/1/trigger-node', $triggerNode->getPath());
     }
 
@@ -83,8 +84,9 @@ class ArchivistTest extends AbstractNodeTest
      * @test
      * @throws NodeTypeNotFoundException
      */
-    public function autoPublishingWorksIfConfigured() {
-        $this->createNode('trigger-node1', ['title' => 'New Article', 'date' => new \DateTime('2018-01-19')]);
+    public function autoPublishingWorksIfConfigured()
+    {
+        $this->createNode('trigger-node1', ['title' => 'New Article', 'date' => new DateTime('2018-01-19')]);
         $this->assertCount(1, $this->node->getChildNodes('PunktDe.Archivist.HierarchyNode'));
 
         $childNodes = $this->node->getChildNodes('PunktDe.Archivist.HierarchyNode');
@@ -100,8 +102,8 @@ class ArchivistTest extends AbstractNodeTest
      */
     public function hierarchyIsNotCreatedTwice()
     {
-        $this->createNode('trigger-node1', ['title' => 'New Article', 'date' => new \DateTime('2018-01-19')]);
-        $this->createNode('trigger-node2', ['title' => 'New Article', 'date' => new \DateTime('2018-01-19')]);
+        $this->createNode('trigger-node1', ['title' => 'New Article', 'date' => new DateTime('2018-01-19')]);
+        $this->createNode('trigger-node2', ['title' => 'New Article', 'date' => new DateTime('2018-01-19')]);
 
         $this->assertCount(1, $this->node->getChildNodes('PunktDe.Archivist.HierarchyNode'));
     }
@@ -112,8 +114,8 @@ class ArchivistTest extends AbstractNodeTest
      */
     public function hierarchyNodesAreSortedCorrectlyWithSimpleProperty()
     {
-        $this->createNode('trigger-node1', ['title' => 'New Article', 'date' => new \DateTime('2018-01-20')]);
-        $this->createNode('trigger-node2', ['title' => 'New Article', 'date' => new \DateTime('2017-01-19')]);
+        $this->createNode('trigger-node1', ['title' => 'New Article', 'date' => new DateTime('2018-01-20')]);
+        $this->createNode('trigger-node2', ['title' => 'New Article', 'date' => new DateTime('2017-01-19')]);
 
         $yearNodes = $this->node->getChildNodes('PunktDe.Archivist.HierarchyNode');
         $this->assertEquals('2017', $yearNodes[0]->getProperty('title'));
@@ -127,8 +129,8 @@ class ArchivistTest extends AbstractNodeTest
      */
     public function hierarchyNodesAreSortedCorrectlyWithEelExpression()
     {
-        $this->createNode('trigger-node1', ['title' => 'New Article', 'date' => new \DateTime('2018-02-20')]);
-        $this->createNode('trigger-node2', ['title' => 'New Article', 'date' => new \DateTime('2016-01-19')]);
+        $this->createNode('trigger-node1', ['title' => 'New Article', 'date' => new DateTime('2018-02-20')]);
+        $this->createNode('trigger-node2', ['title' => 'New Article', 'date' => new DateTime('2016-01-19')]);
 
         $monthNodes = (new FlowQuery([$this->node]))->children('[instanceof PunktDe.Archivist.HierarchyNode]')->children('[instanceof PunktDe.Archivist.HierarchyNode]')->get();
         $this->assertEquals('1', $monthNodes[0]->getProperty('title'));
@@ -142,8 +144,8 @@ class ArchivistTest extends AbstractNodeTest
      */
     public function createdNodesAreSortedCorrectly()
     {
-        $this->createNode('trigger-node2', ['title' => 'Node 2', 'date' => new \DateTime('2018-01-19')]);
-        $this->createNode('trigger-node1', ['title' => 'Node 1', 'date' => new \DateTime('2018-01-19')]);
+        $this->createNode('trigger-node2', ['title' => 'Node 2', 'date' => new DateTime('2018-01-19')]);
+        $this->createNode('trigger-node1', ['title' => 'Node 1', 'date' => new DateTime('2018-01-19')]);
 
         $triggerNodes = (new FlowQuery([$this->node]))->find('[instanceof PunktDe.Archivist.TriggerNode]')->get();
         $this->assertCount(2, $triggerNodes);
@@ -159,8 +161,8 @@ class ArchivistTest extends AbstractNodeTest
      */
     public function nodesAreSortedIfHierarchyAlreadyExist()
     {
-        $triggerNode2 = $this->createNode('trigger-node2', ['title' => 'Node 2', 'date' => new \DateTime('2018-01-19')]);
-        $triggerNode1 = $this->createNode('trigger-node1', ['title' => 'Node 1', 'date' => new \DateTime('2018-01-19')]);
+        $triggerNode2 = $this->createNode('trigger-node2', ['title' => 'Node 2', 'date' => new DateTime('2018-01-19')]);
+        $triggerNode1 = $this->createNode('trigger-node1', ['title' => 'Node 1', 'date' => new DateTime('2018-01-19')]);
 
         $yearNode = (new FlowQuery([$this->node]))->children('[instanceof PunktDe.Archivist.HierarchyNode]')->get(0);
         $this->assertEquals('2018', $yearNode->getProperty('title'));
@@ -196,7 +198,8 @@ class ArchivistTest extends AbstractNodeTest
      * @throws NodeExistsException
      * @throws NodeTypeNotFoundException
      */
-    public function documentNodeIsSortedByTriggeringContentNodeAndDocumentIsMovedAfterwards() {
+    public function documentNodeIsSortedByTriggeringContentNodeAndDocumentIsMovedAfterwards()
+    {
         $unaffectedNode = $this->createNode('unaffect-node', ['title' => 'an unaffected node'], 'Neos.ContentRepository.Testing:Document');
         $affectedDocumentNode = $this->createNode('affected-node', ['title' => 'theTitle'], 'Neos.ContentRepository.Testing:Document');
 
@@ -214,7 +217,8 @@ class ArchivistTest extends AbstractNodeTest
      * @test
      * @throws NodeTypeNotFoundException
      */
-    public function contentNodeIsSortedInDocument() {
+    public function contentNodeIsSortedInDocument()
+    {
         $triggerNodeType = $this->nodeTypeManager->getNodeType('PunktDe.Archivist.TriggerContentNodeToBeSortedInDocument');
 
         $triggerNodeTemplate = new NodeTemplate();
@@ -227,10 +231,24 @@ class ArchivistTest extends AbstractNodeTest
     }
 
     /**
+     * @test
+     * @throws NodeTypeNotFoundException
+     */
+    public function minimalExampleIsValid()
+    {
+        $triggerNode = $this->createNode('trigger-node', ['title' => 'New Article'], 'PunktDe.Archivist.MinimalConfiguredTriggerNode');
+
+        $regex = '/' . str_replace('/', '\/', $this->nodeContextPath . '/node-[a-z0-9]{13}/trigger-node') . '/';
+
+        // The node is sorted in the hierarchy
+        $this->assertRegExp($regex, $triggerNode->getPath());
+    }
+
+    /**
      * @param string $nodeName
      * @param array $properties
      * @param string $triggerNodeType
-     * @return \Neos\ContentRepository\Domain\Model\NodeInterface
+     * @return NodeInterface
      * @throws NodeTypeNotFoundException
      */
     protected function createNode($nodeName = 'trigger-node', array $properties = [], $triggerNodeType = 'PunktDe.Archivist.TriggerNode')

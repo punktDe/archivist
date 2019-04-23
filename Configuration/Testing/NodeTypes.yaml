@@ -18,6 +18,13 @@
     date:
       type: DateTime
 
+'PunktDe.Archivist.MinimalConfiguredTriggerNode':
+  superTypes:
+    'Neos.ContentRepository.Testing:Document': true
+  properties:
+    title:
+      type: string
+
 'PunktDe.Archivist.TriggerContentNode':
   superTypes:
     'Neos.ContentRepository.Testing:Content': true

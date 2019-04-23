@@ -1,5 +1,5 @@
 {
-    "description": "A NeosCMS package that automatically sorts nodes into a predefined structure which is created on the fly.",
+    "description": "A Neos CMS package that automatically sorts nodes into a predefined structure which is created on the fly.",
     "type": "neos-package",
     "name": "punktde/archivist",
     "license": "MIT",
