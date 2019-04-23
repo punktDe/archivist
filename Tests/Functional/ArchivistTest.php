@@ -60,7 +60,7 @@ class ArchivistTest extends AbstractNodeTest
 
         $lvl2 = $lvl1->getChildNodes('PunktDe.Archivist.HierarchyNode')[0];
         $this->assertInstanceOf(NodeInterface::class, $lvl2);
-        $this->assertEquals('01', $lvl2->getProperty('title'));
+        $this->assertEquals('1', $lvl2->getProperty('title'));
         $this->assertEquals($this->nodeContextPath . '/2018/1', $lvl2->getPath());
 
         // The node is sorted in the hierarchy
