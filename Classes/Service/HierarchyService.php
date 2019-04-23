@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace PunktDe\Archivist\Service;
 
 /*
@@ -96,7 +98,7 @@ class HierarchyService
      */
     protected function buildHierarchyLevel(NodeInterface $parentNode, array $hierarchyLevelConfiguration, array $context, bool $publishHierarchy): NodeInterface
     {
-        $hierarchyLevelNodeName = '';
+        $hierarchyLevelNodeName = null;
         $this->evaluateHierarchyLevelConfiguration($hierarchyLevelConfiguration);
 
         $hierarchyLevelNodeType = $this->nodeTypeManager->getNodeType($hierarchyLevelConfiguration['type']);
@@ -112,14 +114,17 @@ class HierarchyService
         $hierarchyLevelNodeTemplate = new NodeTemplate();
         $hierarchyLevelNodeTemplate->setNodeType($hierarchyLevelNodeType);
 
+
         if (isset($hierarchyLevelConfiguration['properties']['name'])) {
             $hierarchyLevelNodeName = (string)$this->eelEvaluationService->evaluateIfValidEelExpression($hierarchyLevelConfiguration['properties']['name'], $context);
-            $hierarchyLevelNodeTemplate->setName(NodeUtility::renderValidNodeName($hierarchyLevelNodeName));
-            unset($hierarchyLevelConfiguration['properties']['name']);
-        }
 
-        if ($hierarchyLevelNodeName === '') {
-            return $parentNode;
+            if($hierarchyLevelNodeName !== '') {
+                $hierarchyLevelNodeTemplate->setName(NodeUtility::renderValidNodeName($hierarchyLevelNodeName));
+            } else {
+                $hierarchyLevelNodeName = null;
+            }
+
+            unset($hierarchyLevelConfiguration['properties']['name']);
         }
 
         if (isset($hierarchyLevelConfiguration['properties'])) {
@@ -223,6 +228,7 @@ class HierarchyService
             }
         }
 
+        $this->logger->log('Publishing node ' . $node->__toString(), LOG_DEBUG);
         $this->publishingService->publishNode($node);
     }
 }
