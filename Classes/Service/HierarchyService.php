@@ -20,8 +20,8 @@ use Neos\ContentRepository\Domain\Model\NodeTemplate;
 use Neos\ContentRepository\Domain\Model\NodeType;
 use Neos\ContentRepository\Domain\Service\NodeTypeManager;
 use Neos\Eel\FlowQuery\FlowQuery;
-use Neos\Flow\Log\SystemLoggerInterface;
 use Neos\ContentRepository\Utility as NodeUtility;
+use Neos\Flow\Log\PsrSystemLoggerInterface;
 use PunktDe\Archivist\Exception\ArchivistConfigurationException;
 
 /**
@@ -61,7 +61,7 @@ class HierarchyService
 
     /**
      * @Flow\Inject
-     * @var SystemLoggerInterface
+     * @var PsrSystemLoggerInterface
      */
     protected $logger;
 
@@ -137,7 +137,7 @@ class HierarchyService
 
         $hierarchyLevelNode = $parentNode->createNodeFromTemplate($hierarchyLevelNodeTemplate, $hierarchyLevelNodeName);
 
-        $this->logger->log(sprintf('Built hierarchy level on path %s with node type %s ', $hierarchyLevelNode->getPath(), $hierarchyLevelConfiguration['type']), LOG_DEBUG);
+        $this->logger->debug(sprintf('Built hierarchy level on path %s with node type %s ', $hierarchyLevelNode->getPath(), $hierarchyLevelConfiguration['type']));
 
         if (isset($hierarchyLevelConfiguration['sorting'])) {
             $this->sortingService->sortChildren($hierarchyLevelNode, $hierarchyLevelConfiguration['sorting'], $hierarchyLevelNodeType->getName());
@@ -228,7 +228,7 @@ class HierarchyService
             }
         }
 
-        $this->logger->log('Publishing node ' . $node->__toString(), LOG_DEBUG);
+        $this->logger->debug('Publishing node ' . $node->__toString());
         $this->publishingService->publishNode($node);
     }
 }

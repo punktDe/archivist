@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace PunktDe\Archivist\Service;
 
 /*
@@ -11,7 +13,6 @@ namespace PunktDe\Archivist\Service;
 
 use Neos\Flow\Annotations as Flow;
 use Neos\ContentRepository\Domain\Model\NodeInterface;
-use Neos\Flow\Log\SystemLoggerInterface;
 
 /**
  * @Flow\Scope("singleton")
@@ -23,12 +24,6 @@ class SortingService
      * @var EelEvaluationService
      */
     protected $eelEvaluationService;
-
-    /**
-     * @Flow\Inject
-     * @var SystemLoggerInterface
-     */
-    protected $logger;
 
     /**
      * @param NodeInterface $nodeToBeSorted

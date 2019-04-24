@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace PunktDe\Archivist;
 
 /*
@@ -10,14 +12,17 @@ namespace PunktDe\Archivist;
  */
 
 use Neos\ContentRepository\Domain\Repository\NodeDataRepository;
+use Neos\ContentRepository\Exception\NodeTypeNotFoundException;
+use Neos\Eel\Exception;
 use Neos\Eel\FlowQuery\FlowQuery;
 use Neos\Flow\Annotations as Flow;
 use Neos\ContentRepository\Domain\Model\NodeInterface;
-use Neos\Flow\Log\SystemLoggerInterface;
+use Neos\Flow\Log\PsrSystemLoggerInterface;
 use PunktDe\Archivist\Exception\ArchivistConfigurationException;
 use PunktDe\Archivist\Service\EelEvaluationService;
 use PunktDe\Archivist\Service\HierarchyService;
 use PunktDe\Archivist\Service\SortingService;
+use PunktDe\Polyfill\LogEnvironment\Utility\LogEnvironment;
 
 class Archivist
 {
@@ -47,7 +52,7 @@ class Archivist
 
     /**
      * @Flow\Inject
-     * @var SystemLoggerInterface
+     * @var PsrSystemLoggerInterface
      */
     protected $logger;
 
@@ -75,8 +80,8 @@ class Archivist
      * @param NodeInterface $triggeringNode
      * @param array $sortingInstructions
      * @throws ArchivistConfigurationException
-     * @throws \Neos\ContentRepository\Exception\NodeTypeNotFoundException
-     * @throws \Neos\Eel\Exception
+     * @throws NodeTypeNotFoundException
+     * @throws Exception
      */
     public function organizeNode(NodeInterface $triggeringNode, array $sortingInstructions)
     {
@@ -91,7 +96,7 @@ class Archivist
             $affectedNode = $this->eelEvaluationService->evaluate($sortingInstructions['affectedNode'], ['node' => $triggeringNode]);
 
             if (!($affectedNode instanceof NodeInterface)) {
-                $this->logger->log(sprintf('A node of type %s (%s) triggered node organization but the affectedNode was not found.', $triggeringNode->getNodeType()->getName(), $triggeringNode->getIdentifier()));
+                $this->logger->warning(sprintf('A node of type %s (%s) triggered node organization but the affectedNode was not found.', $triggeringNode->getNodeType()->getName(), $triggeringNode->getIdentifier()), LogEnvironment::fromMethodName(__METHOD__));
                 return;
             }
         } else {
@@ -101,7 +106,7 @@ class Archivist
         $this->lockNodeForProcessing($affectedNode);
         $this->nodeDataRepository->persistEntities();
 
-        $this->logger->log(sprintf('Organizing node of type %s with path %s', $affectedNode->getNodeType()->getName(), $affectedNode->getPath()), LOG_DEBUG);
+        $this->logger->info(sprintf('Organizing node of type %s with path %s', $affectedNode->getNodeType()->getName(), $affectedNode->getPath()), LogEnvironment::fromMethodName(__METHOD__));
         $context = $this->buildBaseContext($triggeringNode, $sortingInstructions);
 
         if (isset($sortingInstructions['context']) && is_array($sortingInstructions['context'])) {
@@ -116,7 +121,7 @@ class Archivist
 
                 $this->organizedNodeParents[$affectedNode->getIdentifier()] = $affectedNode->getParent();
 
-                $this->logger->log(sprintf('Moved affected node %s to path %s', $affectedNode->getNodeType()->getName(), $affectedNode->getPath()), LOG_DEBUG);
+                $this->logger->debug(sprintf('Moved affected node %s to path %s', $affectedNode->getNodeType()->getName(), $affectedNode->getPath()));
             }
         }
 
@@ -141,7 +146,7 @@ class Archivist
      *
      * @param NodeInterface $node
      * @return bool
-     * @throws \Neos\Eel\Exception
+     * @throws Exception
      */
     public function restorePathIfOrganizedDuringThisRequest(NodeInterface $node): bool
     {
@@ -151,7 +156,7 @@ class Archivist
             }
 
             $node->moveInto($this->organizedNodeParents[$node->getIdentifier()]);
-            $this->logger->log(sprintf('Path of affected node %s was restored', $node->getPath()), LOG_DEBUG);
+            $this->logger->debug(sprintf('Path of affected node %s was restored', $node->getPath()));
             return true;
         }
 
@@ -193,7 +198,7 @@ class Archivist
      * @param array $sortingInstructions
      * @return array
      * @throws ArchivistConfigurationException
-     * @throws \Neos\Eel\Exception
+     * @throws Exception
      */
     protected function buildBaseContext(NodeInterface $node, array $sortingInstructions): array
     {
@@ -221,7 +226,7 @@ class Archivist
      * @param array $baseContext
      * @param array $contextConfiguration
      * @return array
-     * @throws \Neos\Eel\Exception
+     * @throws Exception
      */
     protected function buildCustomContext(array $baseContext, array $contextConfiguration): array
     {
