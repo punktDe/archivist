@@ -131,7 +131,7 @@ class HierarchyService
             $this->applyProperties($hierarchyLevelNodeTemplate, $hierarchyLevelConfiguration['properties'], $context);
         }
 
-        if ($hierarchyLevelNodeType->isOfType('Neos.Neos:Document') && !isset($this->properties['uriPathSegment'])) {
+        if ($hierarchyLevelNodeType->isOfType('Neos.Neos:Document') && !isset($hierarchyLevelConfiguration['properties']['uriPathSegment'])) {
             $hierarchyLevelNodeTemplate->setProperty('uriPathSegment', $hierarchyLevelNodeTemplate->getName());
         }
 
