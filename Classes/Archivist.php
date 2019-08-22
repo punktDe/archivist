@@ -13,7 +13,8 @@ use Neos\ContentRepository\Domain\Repository\NodeDataRepository;
 use Neos\Eel\FlowQuery\FlowQuery;
 use Neos\Flow\Annotations as Flow;
 use Neos\ContentRepository\Domain\Model\NodeInterface;
-use Neos\Flow\Log\SystemLoggerInterface;
+use Neos\Flow\Log\Utility\LogEnvironment;
+use Psr\Log\LoggerInterface;
 use PunktDe\Archivist\Exception\ArchivistConfigurationException;
 use PunktDe\Archivist\Service\EelEvaluationService;
 use PunktDe\Archivist\Service\HierarchyService;
@@ -47,7 +48,7 @@ class Archivist
 
     /**
      * @Flow\Inject
-     * @var SystemLoggerInterface
+     * @var LoggerInterface
      */
     protected $logger;
 
@@ -91,7 +92,7 @@ class Archivist
             $affectedNode = $this->eelEvaluationService->evaluate($sortingInstructions['affectedNode'], ['node' => $triggeringNode]);
 
             if (!($affectedNode instanceof NodeInterface)) {
-                $this->logger->log(sprintf('A node of type %s (%s) triggered node organization but the affectedNode was not found.', $triggeringNode->getNodeType()->getName(), $triggeringNode->getIdentifier()));
+                $this->logger->info(sprintf('A node of type %s (%s) triggered node organization but the affectedNode was not found.', $triggeringNode->getNodeType()->getName(), $triggeringNode->getIdentifier()), LogEnvironment::fromMethodName(__METHOD__));
                 return;
             }
         } else {
@@ -101,7 +102,7 @@ class Archivist
         $this->lockNodeForProcessing($affectedNode);
         $this->nodeDataRepository->persistEntities();
 
-        $this->logger->log(sprintf('Organizing node of type %s with path %s', $affectedNode->getNodeType()->getName(), $affectedNode->getPath()), LOG_DEBUG);
+        $this->logger->debug(sprintf('Organizing node of type %s with path %s', $affectedNode->getNodeType()->getName(), $affectedNode->getPath()), LogEnvironment::fromMethodName(__METHOD__));
         $context = $this->buildBaseContext($triggeringNode, $sortingInstructions);
 
         if (isset($sortingInstructions['context']) && is_array($sortingInstructions['context'])) {
@@ -116,7 +117,7 @@ class Archivist
 
                 $this->organizedNodeParents[$affectedNode->getIdentifier()] = $affectedNode->getParent();
 
-                $this->logger->log(sprintf('Moved affected node %s to path %s', $affectedNode->getNodeType()->getName(), $affectedNode->getPath()), LOG_DEBUG);
+                $this->logger->debug(sprintf('Moved affected node %s to path %s', $affectedNode->getNodeType()->getName(), $affectedNode->getPath()), LogEnvironment::fromMethodName(__METHOD__));
             }
         }
 
@@ -151,7 +152,7 @@ class Archivist
             }
 
             $node->moveInto($this->organizedNodeParents[$node->getIdentifier()]);
-            $this->logger->log(sprintf('Path of affected node %s was restored', $node->getPath()), LOG_DEBUG);
+            $this->logger->debug(sprintf('Path of affected node %s was restored', $node->getPath()), LogEnvironment::fromMethodName(__METHOD__));
             return true;
         }
 
