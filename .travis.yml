@@ -5,13 +5,13 @@ matrix:
 
 sudo: false
 before_install:
-  - export NEOS_TARGET_VERSION=4.0
+  - export NEOS_TARGET_VERSION=4.3
   - cd ..
   - git clone https://github.com/neos/neos-base-distribution.git -b ${NEOS_TARGET_VERSION}
   - cd neos-base-distribution
-  - composer require --no-update --no-interaction neos/neos-ui
-  - composer require --no-update --no-interaction neos/neos-ui-compiled
-  - composer require --no-update --no-interaction punktde/archivist:2.2.x-dev
+  - composer require --no-update --no-interaction neos/neos-ui "^4.0"
+  - composer require --no-update --no-interaction neos/neos-ui-compiled "^4.0"
+  - composer require --no-update --no-interaction punktde/archivist "2.2.x-dev"
 install:
   - composer install --no-interaction
   - cd ..
