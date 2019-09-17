@@ -11,7 +11,7 @@ before_install:
   - cd neos-base-distribution
   - composer require --no-update --no-interaction neos/neos-ui
   - composer require --no-update --no-interaction neos/neos-ui-compiled
-  - composer require --no-update --no-interaction punktde/archivist:dev-master
+  - composer require --no-update --no-interaction punktde/archivist:2.2.x-dev
 install:
   - composer install --no-interaction
   - cd ..
