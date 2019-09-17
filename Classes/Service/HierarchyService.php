@@ -94,6 +94,7 @@ class HierarchyService
      * @return NodeInterface The created or found hierarchy node
      * @throws ArchivistConfigurationException
      * @throws NodeTypeNotFoundException
+     * @throws \Neos\ContentRepository\Exception\NodeExistsException
      * @throws \Neos\Eel\Exception
      */
     protected function buildHierarchyLevel(NodeInterface $parentNode, array $hierarchyLevelConfiguration, array $context, bool $publishHierarchy): NodeInterface
@@ -127,15 +128,15 @@ class HierarchyService
             unset($hierarchyLevelConfiguration['properties']['name']);
         }
 
+        $hierarchyLevelNode = $parentNode->createNode($hierarchyLevelNodeTemplate->getName(), $hierarchyLevelNodeTemplate->getNodeType());
+
         if (isset($hierarchyLevelConfiguration['properties'])) {
-            $this->applyProperties($hierarchyLevelNodeTemplate, $hierarchyLevelConfiguration['properties'], $context);
+            $this->applyProperties($hierarchyLevelNode, $hierarchyLevelConfiguration['properties'], $context);
         }
 
         if ($hierarchyLevelNodeType->isOfType('Neos.Neos:Document') && !isset($hierarchyLevelConfiguration['properties']['uriPathSegment'])) {
-            $hierarchyLevelNodeTemplate->setProperty('uriPathSegment', $hierarchyLevelNodeTemplate->getName());
+            $hierarchyLevelNode->setProperty('uriPathSegment', $hierarchyLevelNode->getName());
         }
-
-        $hierarchyLevelNode = $parentNode->createNodeFromTemplate($hierarchyLevelNodeTemplate, $hierarchyLevelNodeName);
 
         $this->logger->log(sprintf('Built hierarchy level on path %s with node type %s ', $hierarchyLevelNode->getPath(), $hierarchyLevelConfiguration['type']), LOG_DEBUG);
 
@@ -155,12 +156,12 @@ class HierarchyService
     }
 
     /**
-     * @param NodeTemplate $node
+     * @param NodeInterface $node
      * @param array $properties
      * @param array $context
      * @throws \Neos\Eel\Exception
      */
-    protected function applyProperties(NodeTemplate $node, array $properties, array $context)
+    protected function applyProperties(NodeInterface $node, array $properties, array $context)
     {
         foreach ($properties as $propertyName => $propertyValue) {
             $propertyValue = $this->eelEvaluationService->evaluateIfValidEelExpression($propertyValue, $context);
