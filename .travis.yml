@@ -5,7 +5,7 @@ matrix:
 
 sudo: false
 before_install:
-  - export NEOS_TARGET_VERSION=4.2
+  - export NEOS_TARGET_VERSION=5.0
   - cd ..
   - git clone https://github.com/neos/neos-base-distribution.git -b ${NEOS_TARGET_VERSION}
   - cd neos-base-distribution
