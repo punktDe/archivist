@@ -38,7 +38,7 @@ class NodeSignalInterceptor
      */
     public function nodeAdded(NodeInterface $node)
     {
-        if (!array_key_exists($node->getNodeType()->getName(), $this->sortingInstructions)) {
+        if (!array_key_exists($node->getNodeType()->getName(), $this->sortingInstructions ?? [])) {
             return;
         }
 
@@ -61,7 +61,7 @@ class NodeSignalInterceptor
             return;
         }
 
-        if (array_key_exists($node->getNodeType()->getName(), $this->sortingInstructions)) {
+        if (array_key_exists($node->getNodeType()->getName(), $this->sortingInstructions ?? [])) {
             $this->createArchivist()->organizeNode($node, $this->sortingInstructions[$node->getNodeType()->getName()]);
         }
     }
