@@ -112,7 +112,7 @@ class Archivist
         if (isset($sortingInstructions['hierarchy']) && is_array($sortingInstructions['hierarchy'])) {
             $hierarchyNode = $this->hierarchyService->buildHierarchy($sortingInstructions['hierarchy'], $context, $sortingInstructions['publishHierarchy'] ?? false);
 
-            if ($affectedNode->getParent() !== $hierarchyNode) {
+            if ($affectedNode->getParent()->getPath() !== $hierarchyNode->getPath()) {
                 $affectedNode->moveInto($hierarchyNode);
 
                 $this->organizedNodeParents[$affectedNode->getIdentifier()] = $affectedNode->getParent();
