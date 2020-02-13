@@ -13,6 +13,7 @@ use Neos\ContentRepository\Domain\Repository\NodeDataRepository;
 use Neos\Eel\FlowQuery\FlowQuery;
 use Neos\Flow\Annotations as Flow;
 use Neos\ContentRepository\Domain\Model\NodeInterface;
+use Neos\Flow\Log\ThrowableStorageInterface;
 use Neos\Flow\Log\Utility\LogEnvironment;
 use Psr\Log\LoggerInterface;
 use PunktDe\Archivist\Exception\ArchivistConfigurationException;
@@ -51,6 +52,12 @@ class Archivist
      * @var LoggerInterface
      */
     protected $logger;
+
+    /**
+     * @Flow\Inject
+     * @var ThrowableStorageInterface
+     */
+    protected $throwableStorage;
 
     /**
      * @var array
@@ -112,7 +119,8 @@ class Archivist
         if (isset($sortingInstructions['hierarchy']) && is_array($sortingInstructions['hierarchy'])) {
             $hierarchyNode = $this->hierarchyService->buildHierarchy($sortingInstructions['hierarchy'], $context, $sortingInstructions['publishHierarchy'] ?? false);
 
-            if ($affectedNode->getParent()->getPath() !== $hierarchyNode->getPath()) {
+            if ($hierarchyNode !== $affectedNode->getParent() && $hierarchyNode->getNode($affectedNode->getName()) === null) {
+
                 $affectedNode->moveInto($hierarchyNode);
 
                 $this->organizedNodeParents[$affectedNode->getIdentifier()] = $affectedNode->getParent();
@@ -147,7 +155,7 @@ class Archivist
     public function restorePathIfOrganizedDuringThisRequest(NodeInterface $node): bool
     {
         if (isset($this->organizedNodeParents[$node->getIdentifier()])) {
-            if ($node->getParent() === $this->organizedNodeParents[$node->getIdentifier()]) {
+            if ($this->organizedNodeParents[$node->getIdentifier()] !== $node->getParent() && $this->organizedNodeParents[$node->getIdentifier()]->getNode($node->getName()) !== null) {
                 return true;
             }
 
