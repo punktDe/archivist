@@ -22,6 +22,9 @@ use Neos\ContentRepository\Domain\Service\NodeTypeManager;
 use Neos\Eel\FlowQuery\FlowQuery;
 use Neos\ContentRepository\Utility as NodeUtility;
 use Neos\Flow\Log\Utility\LogEnvironment;
+use Neos\Neos\Ui\Domain\Model\Feedback\Operations\NodeCreated;
+use Neos\Neos\Ui\Domain\Model\Feedback\Operations\UpdateNodeInfo;
+use Neos\Neos\Ui\Domain\Model\FeedbackCollection;
 use Psr\Log\LoggerInterface;
 use PunktDe\Archivist\Exception\ArchivistConfigurationException;
 
@@ -59,6 +62,12 @@ class HierarchyService
      * @var PublishingServiceInterface
      */
     protected $publishingService;
+
+    /**
+     * @Flow\Inject
+     * @var FeedbackCollection
+     */
+    protected $feedbackCollection;
 
     /**
      * @Flow\Inject
@@ -115,11 +124,10 @@ class HierarchyService
         $hierarchyLevelNodeTemplate = new NodeTemplate();
         $hierarchyLevelNodeTemplate->setNodeType($hierarchyLevelNodeType);
 
-
         if (isset($hierarchyLevelConfiguration['properties']['name'])) {
             $hierarchyLevelNodeName = (string)$this->eelEvaluationService->evaluateIfValidEelExpression($hierarchyLevelConfiguration['properties']['name'], $context);
 
-            if($hierarchyLevelNodeName !== '') {
+            if ($hierarchyLevelNodeName !== '') {
                 $hierarchyLevelNodeTemplate->setName(NodeUtility::renderValidNodeName($hierarchyLevelNodeName));
             } else {
                 $hierarchyLevelNodeName = null;
@@ -152,6 +160,8 @@ class HierarchyService
 
         $this->nodeDataRepository->persistEntities();
 
+        $this->sendNodeCreatedFeedback($parentNode, $hierarchyLevelNode);
+
         return $hierarchyLevelNode;
     }
 
@@ -173,7 +183,7 @@ class HierarchyService
      * @param array $hierarchyLevelConfiguration
      * @throws ArchivistConfigurationException
      */
-    protected function evaluateHierarchyLevelConfiguration(array $hierarchyLevelConfiguration)
+    protected function evaluateHierarchyLevelConfiguration(array $hierarchyLevelConfiguration): void
     {
         if (!isset($hierarchyLevelConfiguration['type'])) {
             throw new ArchivistConfigurationException('Missing "type" setting for archivist hierarchy', 1516371948);
@@ -231,5 +241,20 @@ class HierarchyService
 
         $this->logger->debug('Publishing node ' . $node->__toString(), LogEnvironment::fromMethodName(__METHOD__));
         $this->publishingService->publishNode($node);
+    }
+
+    /**
+     * @param NodeInterface $parentNode
+     * @param NodeInterface $hierarchyLevelNode
+     */
+    private function sendNodeCreatedFeedback(NodeInterface $parentNode, NodeInterface $hierarchyLevelNode): void
+    {
+        $createdNodeInfo = new NodeCreated();
+        $createdNodeInfo->setNode($hierarchyLevelNode);
+        $this->feedbackCollection->add($createdNodeInfo);
+
+        $updateNodeInfo = new UpdateNodeInfo();
+        $updateNodeInfo->setNode($parentNode);
+        $this->feedbackCollection->add($updateNodeInfo);
     }
 }

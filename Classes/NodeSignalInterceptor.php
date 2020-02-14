@@ -36,7 +36,7 @@ class NodeSignalInterceptor
      * @throws NodeTypeNotFoundException
      * @throws \Neos\Eel\Exception
      */
-    public function nodeAdded(NodeInterface $node)
+    public function nodeAdded(NodeInterface $node): void
     {
         if (!array_key_exists($node->getNodeType()->getName(), $this->sortingInstructions ?? [])) {
             return;
@@ -51,7 +51,7 @@ class NodeSignalInterceptor
      * @throws NodeTypeNotFoundException
      * @throws \Neos\Eel\Exception
      */
-    public function nodeUpdated(NodeInterface $node)
+    public function nodeUpdated(NodeInterface $node): void
     {
         if($this->createArchivist()->isNodeInProcess($node)) {
             return;

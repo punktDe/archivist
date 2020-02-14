@@ -13,7 +13,11 @@ use Neos\ContentRepository\Domain\Repository\NodeDataRepository;
 use Neos\Eel\FlowQuery\FlowQuery;
 use Neos\Flow\Annotations as Flow;
 use Neos\ContentRepository\Domain\Model\NodeInterface;
+use Neos\Flow\Log\ThrowableStorageInterface;
 use Neos\Flow\Log\Utility\LogEnvironment;
+use Neos\Neos\Ui\Domain\Model\Feedback\Operations\NodeCreated;
+use Neos\Neos\Ui\Domain\Model\Feedback\Operations\UpdateNodeInfo;
+use Neos\Neos\Ui\Domain\Model\FeedbackCollection;
 use Psr\Log\LoggerInterface;
 use PunktDe\Archivist\Exception\ArchivistConfigurationException;
 use PunktDe\Archivist\Service\EelEvaluationService;
@@ -53,6 +57,12 @@ class Archivist
     protected $logger;
 
     /**
+     * @Flow\Inject
+     * @var ThrowableStorageInterface
+     */
+    protected $throwableStorage;
+
+    /**
      * @var array
      */
     protected $context;
@@ -73,13 +83,25 @@ class Archivist
     protected $nodesInProcessing = [];
 
     /**
+     * @Flow\Inject
+     * @var FeedbackCollection
+     */
+    protected $feedbackCollection;
+
+    /**
+     * @Flow\Inject
+     * @var AffectedNodeStorage
+     */
+    protected $affectedNodeStorage;
+
+    /**
      * @param NodeInterface $triggeringNode
      * @param array $sortingInstructions
      * @throws ArchivistConfigurationException
      * @throws \Neos\ContentRepository\Exception\NodeTypeNotFoundException
      * @throws \Neos\Eel\Exception
      */
-    public function organizeNode(NodeInterface $triggeringNode, array $sortingInstructions)
+    public function organizeNode(NodeInterface $triggeringNode, array $sortingInstructions): void
     {
         if (isset($sortingInstructions['condition'])) {
             $condition = $this->eelEvaluationService->evaluate($sortingInstructions['condition'], ['node' => $triggeringNode]);
@@ -112,10 +134,13 @@ class Archivist
         if (isset($sortingInstructions['hierarchy']) && is_array($sortingInstructions['hierarchy'])) {
             $hierarchyNode = $this->hierarchyService->buildHierarchy($sortingInstructions['hierarchy'], $context, $sortingInstructions['publishHierarchy'] ?? false);
 
-            if ($affectedNode->getParent()->getPath() !== $hierarchyNode->getPath()) {
-                $affectedNode->moveInto($hierarchyNode);
+            if ($hierarchyNode !== $affectedNode->getParent() && $hierarchyNode->getNode($affectedNode->getName()) === null) {
 
+                $this->affectedNodeStorage->addNode($affectedNode);
+                $affectedNode->moveInto($hierarchyNode);
                 $this->organizedNodeParents[$affectedNode->getIdentifier()] = $affectedNode->getParent();
+
+                $this->sendNodeMovedFeedback($affectedNode, $hierarchyNode);
 
                 $this->logger->debug(sprintf('Moved affected node %s to path %s', $affectedNode->getNodeType()->getName(), $affectedNode->getPath()), LogEnvironment::fromMethodName(__METHOD__));
             }
@@ -147,7 +172,7 @@ class Archivist
     public function restorePathIfOrganizedDuringThisRequest(NodeInterface $node): bool
     {
         if (isset($this->organizedNodeParents[$node->getIdentifier()])) {
-            if ($node->getParent() === $this->organizedNodeParents[$node->getIdentifier()]) {
+            if ($this->organizedNodeParents[$node->getIdentifier()] !== $node->getParent() && $this->organizedNodeParents[$node->getIdentifier()]->getNode($node->getName()) !== null) {
                 return true;
             }
 
@@ -168,7 +193,7 @@ class Archivist
      * @param NodeInterface $node
      * @return bool
      */
-    public function isNodeInProcess(NodeInterface $node)
+    public function isNodeInProcess(NodeInterface $node): bool
     {
         return isset($this->nodesInProcessing[$node->getIdentifier()]);
     }
@@ -176,7 +201,7 @@ class Archivist
     /**
      * @param NodeInterface $node
      */
-    protected function lockNodeForProcessing(NodeInterface $node)
+    protected function lockNodeForProcessing(NodeInterface $node): void
     {
         $this->nodesInProcessing[$node->getIdentifier()] = true;
     }
@@ -184,7 +209,7 @@ class Archivist
     /**
      * @param NodeInterface $node
      */
-    protected function releaseNodeProcessingLock(NodeInterface $node)
+    protected function releaseNodeProcessingLock(NodeInterface $node): void
     {
         unset($this->nodesInProcessing[$node->getIdentifier()]);
     }
@@ -231,6 +256,25 @@ class Archivist
             $customContext[$variableName] = $this->eelEvaluationService->evaluate($contextConfigurationExpression, $baseContext);
         }
         return $customContext;
+    }
+
+    /**
+     * @param NodeInterface $affectedNode
+     * @param NodeInterface $hierarchyNode
+     */
+    private function sendNodeMovedFeedback(NodeInterface $affectedNode, NodeInterface $hierarchyNode): void
+    {
+        $created = new NodeCreated();
+        $created->setNode($affectedNode);
+        $this->feedbackCollection->add($created);
+
+        $updateNodeInfo = new UpdateNodeInfo();
+        $updateNodeInfo->setNode($hierarchyNode);
+        $this->feedbackCollection->add($updateNodeInfo);
+
+        $updateNodeInfo = new UpdateNodeInfo();
+        $updateNodeInfo->setNode($affectedNode);
+        $this->feedbackCollection->add($updateNodeInfo);
     }
 }
 
