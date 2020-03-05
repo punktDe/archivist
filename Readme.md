@@ -8,9 +8,6 @@ Neos has some drawbacks, if you store lots of Node - like news for example - on 
 Especially the backend trees are getting slow and confusing. This package automatically sorts this nodes in a configured and 
 automatically created hierarchy.
 
-This package is inspired by the package [Sitegeist Critical Mass](https://github.com/sitegeist/Sitegeist.CriticalMass), 
-but build for the new react UI, with extended feature set and fully tested. 
-
 ## Configuration
 
 You can configure the behavior differently for every triggering node type. The configuration options 
