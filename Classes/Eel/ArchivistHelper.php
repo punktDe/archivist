@@ -25,6 +25,10 @@ class ArchivistHelper implements ProtectedContextAwareInterface
      */
     public function buildSortingCharacter(?string $string, int $position = 0, int $length = 1): string
     {
+        if ($string === null) {
+            return '#';
+        }
+
         $character = mb_substr($string, $position, $length);
 
         // Transliterate (transform 北京 to 'Bei Jing')
