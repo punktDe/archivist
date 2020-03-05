@@ -20,23 +20,24 @@ class ArchivistHelper implements ProtectedContextAwareInterface
     /**
      * @param string $string
      * @param int $position
+     * @param int $length
      * @return string
      */
-    public function buildSortingCharacter(?string $string, int $position = 1): string
+    public function buildSortingCharacter(?string $string, int $position = 0, int $length = 1): string
     {
-        $firstCharacter = mb_substr($string, 0, $position);
+        $character = mb_substr($string, $position, $length);
 
         // Transliterate (transform 北京 to 'Bei Jing')
-        $firstCharacter = Transliterator::transliterate($firstCharacter);
+        $character = Transliterator::transliterate($character);
 
         // Ensure only allowed characters are left
-        $firstCharacter = preg_replace('/[^a-z]/', '#', $firstCharacter);
+        $character = preg_replace('/[^a-z]/', '#', $character);
 
-        if ($firstCharacter === '') {
-            $firstCharacter = '#';
+        if ($character === '') {
+            $character = '#';
         }
 
-        return strtoupper($firstCharacter);
+        return strtoupper($character);
     }
 
     public function allowsCallOfMethod($methodName)
