@@ -38,7 +38,7 @@ class ArchivistTest extends AbstractNodeTest
     /**
      * @test
      */
-    public function nodeStructureIsAvailable()
+    public function nodeStructureIsAvailable(): void
     {
         $this->assertEquals('Neos.ContentRepository.Testing:Page', $this->node->getNodeType()->getName());
     }
@@ -47,7 +47,7 @@ class ArchivistTest extends AbstractNodeTest
      * @test
      * @throws NodeTypeNotFoundException
      */
-    public function simpleCreateNode()
+    public function simpleCreateNode(): void
     {
         $newNode = $this->createNode('trigger-node', ['title' => 'New Article', 'date' => new DateTime('2018-01-19')]);
 
@@ -71,7 +71,7 @@ class ArchivistTest extends AbstractNodeTest
      * @test
      * @throws NodeTypeNotFoundException
      */
-    public function doNotSortWhenConditionIsNotMet()
+    public function doNotSortWhenConditionIsNotMet(): void
     {
         $triggerNode = $this->createNode('trigger-node', ['title' => 'New Article']);
         $this->assertCount(0, $this->node->getChildNodes('PunktDe.Archivist.HierarchyNode'));
@@ -142,7 +142,7 @@ class ArchivistTest extends AbstractNodeTest
      * @throws NodeTypeNotFoundException
      * @throws Exception
      */
-    public function createdNodesAreSortedCorrectly()
+    public function createdNodesAreSortedCorrectly(): void
     {
         $this->createNode('trigger-node2', ['title' => 'Node 2', 'date' => new DateTime('2018-01-19')]);
         $this->createNode('trigger-node1', ['title' => 'Node 1', 'date' => new DateTime('2018-01-19')]);
@@ -159,7 +159,7 @@ class ArchivistTest extends AbstractNodeTest
      * @throws NodeTypeNotFoundException
      * @throws Exception
      */
-    public function nodesAreSortedIfHierarchyAlreadyExist()
+    public function nodesAreSortedIfHierarchyAlreadyExist(): void
     {
         $triggerNode2 = $this->createNode('trigger-node2', ['title' => 'Node 2', 'date' => new DateTime('2018-01-19')]);
         $triggerNode1 = $this->createNode('trigger-node1', ['title' => 'Node 1', 'date' => new DateTime('2018-01-19')]);
@@ -184,7 +184,7 @@ class ArchivistTest extends AbstractNodeTest
      * @throws NodeExistsException
      * @throws NodeTypeNotFoundException
      */
-    public function documentNodeIsSortedByTriggeringContentNode()
+    public function documentNodeIsSortedByTriggeringContentNode(): void
     {
         $affectedDocumentNode = $this->createNode('affected-node', ['title' => 'theTitle'], 'Neos.ContentRepository.Testing:Document');
         $triggerNode = $affectedDocumentNode->createNode('trigger-node', $this->nodeTypeManager->getNodeType('PunktDe.Archivist.TriggerContentNode'));
@@ -198,7 +198,7 @@ class ArchivistTest extends AbstractNodeTest
      * @throws NodeExistsException
      * @throws NodeTypeNotFoundException
      */
-    public function documentNodeIsSortedByTriggeringContentNodeAndDocumentIsMovedAfterwards()
+    public function documentNodeIsSortedByTriggeringContentNodeAndDocumentIsMovedAfterwards(): void
     {
         $unaffectedNode = $this->createNode('unaffect-node', ['title' => 'an unaffected node'], 'Neos.ContentRepository.Testing:Document');
         $affectedDocumentNode = $this->createNode('affected-node', ['title' => 'theTitle'], 'Neos.ContentRepository.Testing:Document');
@@ -217,7 +217,7 @@ class ArchivistTest extends AbstractNodeTest
      * @test
      * @throws NodeTypeNotFoundException
      */
-    public function contentNodeIsSortedInDocument()
+    public function contentNodeIsSortedInDocument(): void
     {
         $triggerNodeType = $this->nodeTypeManager->getNodeType('PunktDe.Archivist.TriggerContentNodeToBeSortedInDocument');
 
@@ -234,7 +234,7 @@ class ArchivistTest extends AbstractNodeTest
      * @test
      * @throws NodeTypeNotFoundException
      */
-    public function minimalExampleIsValid()
+    public function minimalExampleIsValid(): void
     {
         $triggerNode = $this->createNode('trigger-node', ['title' => 'New Article'], 'PunktDe.Archivist.MinimalConfiguredTriggerNode');
 
@@ -251,7 +251,7 @@ class ArchivistTest extends AbstractNodeTest
      * @return NodeInterface
      * @throws NodeTypeNotFoundException
      */
-    protected function createNode($nodeName = 'trigger-node', array $properties = [], $triggerNodeType = 'PunktDe.Archivist.TriggerNode')
+    protected function createNode($nodeName = 'trigger-node', array $properties = [], $triggerNodeType = 'PunktDe.Archivist.TriggerNode'): NodeInterface
     {
         $triggerNodeType = $this->nodeTypeManager->getNodeType($triggerNodeType);
 

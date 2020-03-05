@@ -71,6 +71,8 @@ PunktDe:
       # title node which should be considered to move the page.
       'PunktDe.Archivist.TriggerContentNode':
 
+        condition: "${node.properties.title != null}"
+
         # The query selecting the root node of the automatically created hierarchy
         hierarchyRoot: "${q(site).find('[instanceof Neos.ContentRepository.Testing:Page]').get(0)}"
 
