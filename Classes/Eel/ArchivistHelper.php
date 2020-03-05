@@ -1,4 +1,6 @@
 <?php
+declare(strict_types=1);
+
 namespace PunktDe\Archivist\Eel;
 
 /*
@@ -17,11 +19,12 @@ class ArchivistHelper implements ProtectedContextAwareInterface
 
     /**
      * @param string $string
+     * @param int $position
      * @return string
      */
-    public function buildSortingCharacter(?string $string): string
+    public function buildSortingCharacter(?string $string, int $position = 1): string
     {
-        $firstCharacter = mb_substr($string, 0, 1);
+        $firstCharacter = mb_substr($string, 0, $position);
 
         // Transliterate (transform 北京 to 'Bei Jing')
         $firstCharacter = Transliterator::transliterate($firstCharacter);

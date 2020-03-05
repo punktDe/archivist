@@ -107,4 +107,4 @@ title node which should be considered to move the page.
 
 ## Archivist Eel Helper
 
-`Archivist.buildSortingCharacter(string)` Generates an upper case sorting character from the given string. 
+`Archivist.buildSortingCharacter(string, position = 1)` Generates an upper case sorting character from the given string. Take the character from the given position. 
