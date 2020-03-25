@@ -48,8 +48,8 @@ class NodeSignalInterceptor
             $sortingInstructions = [$sortingInstructions];
         }
 
-        foreach ($sortingInstructions as $sortingInstructions_) {
-            $this->createArchivist()->organizeNode($node, $sortingInstructions_);
+        foreach ($sortingInstructions as $sortingInstruction) {
+            $this->createArchivist()->organizeNode($node, $sortingInstruction);
         }
     }
 
