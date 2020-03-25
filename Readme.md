@@ -102,6 +102,32 @@ title node which should be considered to move the page.
                   name: "${Archivist.buildSortingCharacter(title)}"
                   title: "${Archivist.buildSortingCharacter(title)}"
 
+### Define multiple configurations for the same NodeType
+
+In addition to
+
+```yaml
+PunktDe:
+  Archivist:
+    sortingInstructions:
+      MyNode.Type:
+        hierarchyRoot: # ...
+```
+
+you can now do this:
+
+```yaml
+PunktDe:
+  Archivist:
+    sortingInstructions:
+      MyNode.Type:
+        foo1:
+          hierarchyRoot:  # ...
+        foo2:
+          hierarchyRoot:  # ...
+```
+Make sure, to define a `conditon` to not run several configurations on the same Node action.
+
 ## Archivist Eel Helper
 
 `Archivist.buildSortingCharacter(string, position = 0, length = 1)` Generates upper case sorting characters from the given string. Starting position and length can be defined. 
