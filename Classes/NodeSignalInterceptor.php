@@ -42,7 +42,15 @@ class NodeSignalInterceptor
             return;
         }
 
-        $this->createArchivist()->organizeNode($node, $this->sortingInstructions[$node->getNodeType()->getName()]);
+        $sortingInstructions = $this->sortingInstructions[$node->getNodeType()->getName()];
+
+        if (array_key_exists('hierarchyRoot', $sortingInstructions)) {
+            $sortingInstructions = [$sortingInstructions];
+        }
+
+        foreach ($sortingInstructions as $sortingInstructions_) {
+            $this->createArchivist()->organizeNode($node, $sortingInstructions_);
+        }
     }
 
     /**
@@ -61,9 +69,7 @@ class NodeSignalInterceptor
             return;
         }
 
-        if (array_key_exists($node->getNodeType()->getName(), $this->sortingInstructions ?? [])) {
-            $this->createArchivist()->organizeNode($node, $this->sortingInstructions[$node->getNodeType()->getName()]);
-        }
+        $this->nodeAdded($node);
     }
 
     /**
