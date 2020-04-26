@@ -136,6 +136,12 @@ class HierarchyService
             unset($hierarchyLevelConfiguration['properties']['name']);
         }
 
+        if (isset($hierarchyLevelConfiguration['properties']['hiddenInIndex'])) {
+            $hierarchyLevelNodeHiddenInIndex = (bool)$this->eelEvaluationService->evaluateIfValidEelExpression($hierarchyLevelConfiguration['properties']['hiddenInIndex'], $context);
+            $hierarchyLevelNodeTemplate->setHiddenInIndex($hierarchyLevelNodeHiddenInIndex);
+            unset($hierarchyLevelConfiguration['properties']['hiddenInIndex']);
+        }
+
         if (isset($hierarchyLevelConfiguration['properties'])) {
             $this->applyProperties($hierarchyLevelNodeTemplate, $hierarchyLevelConfiguration['properties'], $context);
         }
