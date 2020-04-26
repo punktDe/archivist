@@ -1,18 +1,18 @@
-# PunktDe.Archivist 
+# PunktDe.Archivist
 
 [![Travis Build Status](https://travis-ci.org/punktDe/archivist.svg?branch=master)](https://travis-ci.org/punktDe/archivist) [![Latest Stable Version](https://poser.pugx.org/punktde/archivist/v/stable)](https://packagist.org/packages/punktde/archivist) [![Total Downloads](https://poser.pugx.org/punktde/archivist/downloads)](https://packagist.org/packages/punktde/archivist)
 
 **Purpose of this package:** Automatically sorts nodes into a predefined structure which is created on the fly.
 
-Neos has some drawbacks, if you store lots of Node - like news for example - on the same hierarchical level. 
-Especially the backend trees are getting slow and confusing. This package automatically sorts this nodes in a configured and 
+Neos has some drawbacks, if you store lots of Node - like news for example - on the same hierarchical level.
+Especially the backend trees are getting slow and confusing. This package automatically sorts this nodes in a configured and
 automatically created hierarchy.
 
 ## Configuration
 
-You can configure the behavior differently for every triggering node type. The configuration options 
+You can configure the behavior differently for every triggering node type. The configuration options
 are best explained by example. These examples are taken from ``Configuration/Testing/Settings.yaml``
-and are thus automatically tested. 
+and are thus automatically tested.
 
 ### Simple Example
 
@@ -54,6 +54,7 @@ PunktDe:
             properties:
               name: "${Date.year(publishDate)}"
               title: "${Date.year(publishDate)}"
+              hiddenInIndex: "${true}"
 
             # The property which is identical throughout all nodes of this level
             identity: title
@@ -80,23 +81,23 @@ title node which should be considered to move the page.
       Archivist:
         sortingInstructions:
           'PunktDe.Archivist.TriggerContentNode':
-    
+
             # The query selecting the root node of the automatically created hierarchy
             hierarchyRoot: "${q(site).find('[instanceof Neos.ContentRepository.Testing:Page]').get(0)}"
-    
+
             # Optional: The node to be moved, described by an Eel query.
             # This defaults to the triggering node if not set. The triggering node is available as "node".
             # If the affected node is not found by the operation is skipped.
             # This can for example be used if a change in a content node should move its parent document node
             #
             affectedNode: "${q(node).parent('[instanceof Neos.ContentRepository.Testing:Document]').get(0)}"
-    
+
             # Definition of the auto-generated hierarchy
             hierarchy:
               -
                 # The type of the hierarchy-node
                 type: 'PunktDe.Archivist.HierarchyNode'
-    
+
                 # Properties of the new created node.
                 properties:
                   name: "${Archivist.buildSortingCharacter(title)}"
@@ -130,4 +131,4 @@ Make sure, to define a `conditon` to not run several configurations on the same 
 
 ## Archivist Eel Helper
 
-`Archivist.buildSortingCharacter(string, position = 0, length = 1)` Generates upper case sorting characters from the given string. Starting position and length can be defined. 
+`Archivist.buildSortingCharacter(string, position = 0, length = 1)` Generates upper case sorting characters from the given string. Starting position and length can be defined.
