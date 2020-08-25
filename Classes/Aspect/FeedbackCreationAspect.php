@@ -46,7 +46,7 @@ class FeedbackCreationAspect
         /** @var NodeInterface $subject */
         $subject = $joinPoint->getMethodArgument('subject');
         if($subject instanceof  NodeInterface && $this->affectedNodeStorage->hasNode($subject)) {
-            $this->logger->debug('Prevented the original node created feedback, as it would return the wrong node path.', LogEnvironment::fromMethodName(__METHOD__));
+            $this->logger->info('Prevented the original node created feedback, as it would return the wrong node path.', LogEnvironment::fromMethodName(__METHOD__));
             return;
         }
 

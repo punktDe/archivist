@@ -124,7 +124,7 @@ class Archivist
         $this->lockNodeForProcessing($affectedNode);
         $this->nodeDataRepository->persistEntities();
 
-        $this->logger->debug(sprintf('Organizing node of type %s with path %s', $affectedNode->getNodeType()->getName(), $affectedNode->getPath()), LogEnvironment::fromMethodName(__METHOD__));
+        $this->logger->info(sprintf('Organizing node of type %s with path %s', $affectedNode->getNodeType()->getName(), $affectedNode->getPath()), LogEnvironment::fromMethodName(__METHOD__));
         $context = $this->buildBaseContext($triggeringNode, $sortingInstructions);
 
         if (isset($sortingInstructions['context']) && is_array($sortingInstructions['context'])) {
@@ -142,7 +142,7 @@ class Archivist
 
                 $this->sendNodeMovedFeedback($affectedNode, $hierarchyNode);
 
-                $this->logger->debug(sprintf('Moved affected node %s to path %s', $affectedNode->getNodeType()->getName(), $affectedNode->getPath()), LogEnvironment::fromMethodName(__METHOD__));
+                $this->logger->info(sprintf('Moved affected node %s to path %s', $affectedNode->getNodeType()->getName(), $affectedNode->getPath()), LogEnvironment::fromMethodName(__METHOD__));
             }
         }
 
@@ -177,7 +177,7 @@ class Archivist
             }
 
             $node->moveInto($this->organizedNodeParents[$node->getIdentifier()]);
-            $this->logger->debug(sprintf('Path of affected node %s was restored', $node->getPath()), LogEnvironment::fromMethodName(__METHOD__));
+            $this->logger->info(sprintf('Path of affected node %s was restored', $node->getPath()), LogEnvironment::fromMethodName(__METHOD__));
             return true;
         }
 

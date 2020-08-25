@@ -152,7 +152,7 @@ class HierarchyService
 
         $hierarchyLevelNode = $parentNode->createNodeFromTemplate($hierarchyLevelNodeTemplate, $hierarchyLevelNodeName);
 
-        $this->logger->debug(sprintf('Built hierarchy level on path %s with node type %s ', $hierarchyLevelNode->getPath(), $hierarchyLevelConfiguration['type']), LogEnvironment::fromMethodName(__METHOD__));
+        $this->logger->info(sprintf('Built hierarchy level on path %s with node type %s ', $hierarchyLevelNode->getPath(), $hierarchyLevelConfiguration['type']), LogEnvironment::fromMethodName(__METHOD__));
 
         if (isset($hierarchyLevelConfiguration['sorting'])) {
             $this->sortingService->sortChildren($hierarchyLevelNode, $hierarchyLevelConfiguration['sorting'], $hierarchyLevelNodeType->getName());
@@ -245,7 +245,7 @@ class HierarchyService
             }
         }
 
-        $this->logger->debug('Publishing node ' . $node->__toString(), LogEnvironment::fromMethodName(__METHOD__));
+        $this->logger->info('Publishing node ' . $node->__toString(), LogEnvironment::fromMethodName(__METHOD__));
         $this->publishingService->publishNode($node);
     }
 
