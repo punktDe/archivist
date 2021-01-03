@@ -5,7 +5,7 @@
     "license": "MIT",
     "require": {
         "php": "^7.2",
-        "neos/neos": "^5.0",
+        "neos/neos": "^5.0 || ^7.0 || dev-master",
         "neos/neos-ui": "*",
         "neos/neos-ui-compiled": "*",
         "behat/transliterator": "*"
