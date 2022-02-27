@@ -20,6 +20,7 @@ Configuration for the nodeType 'PunktDe.Archivist.TriggerNode'. The sorting is t
 node of this type is created or if a property on this node is changed. This node is then
 available as 'node' in the other parts of the configuration
 
+```yaml
 PunktDe:
   Archivist:
     sortingInstructions:
@@ -70,13 +71,14 @@ PunktDe:
 
             # Simple sorting on a property
             sorting: title
-
+```
 
 ### Example with a triggering content node
 
 A content node triggers the move of its parent document node. For example, if you have a
 title node which should be considered to move the page.
 
+```yaml
     PunktDe:
       Archivist:
         sortingInstructions:
@@ -102,6 +104,7 @@ title node which should be considered to move the page.
                 properties:
                   name: "${Archivist.buildSortingCharacter(title)}"
                   title: "${Archivist.buildSortingCharacter(title)}"
+```
 
 ### Define multiple configurations for the same NodeType
 
