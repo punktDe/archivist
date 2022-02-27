@@ -79,31 +79,31 @@ A content node triggers the move of its parent document node. For example, if yo
 title node which should be considered to move the page.
 
 ```yaml
-    PunktDe:
-      Archivist:
-        sortingInstructions:
-          'PunktDe.Archivist.TriggerContentNode':
+PunktDe:
+  Archivist:
+    sortingInstructions:
+      'PunktDe.Archivist.TriggerContentNode':
 
-            # The query selecting the root node of the automatically created hierarchy
-            hierarchyRoot: "${q(site).find('[instanceof Neos.ContentRepository.Testing:Page]').get(0)}"
+        # The query selecting the root node of the automatically created hierarchy
+        hierarchyRoot: "${q(site).find('[instanceof Neos.ContentRepository.Testing:Page]').get(0)}"
 
-            # Optional: The node to be moved, described by an Eel query.
-            # This defaults to the triggering node if not set. The triggering node is available as "node".
-            # If the affected node is not found by the operation is skipped.
-            # This can for example be used if a change in a content node should move its parent document node
-            #
-            affectedNode: "${q(node).parent('[instanceof Neos.ContentRepository.Testing:Document]').get(0)}"
+        # Optional: The node to be moved, described by an Eel query.
+        # This defaults to the triggering node if not set. The triggering node is available as "node".
+        # If the affected node is not found by the operation is skipped.
+        # This can for example be used if a change in a content node should move its parent document node
+        #
+        affectedNode: "${q(node).parent('[instanceof Neos.ContentRepository.Testing:Document]').get(0)}"
 
-            # Definition of the auto-generated hierarchy
-            hierarchy:
-              -
-                # The type of the hierarchy-node
-                type: 'PunktDe.Archivist.HierarchyNode'
+        # Definition of the auto-generated hierarchy
+        hierarchy:
+          -
+            # The type of the hierarchy-node
+            type: 'PunktDe.Archivist.HierarchyNode'
 
-                # Properties of the new created node.
-                properties:
-                  name: "${Archivist.buildSortingCharacter(title)}"
-                  title: "${Archivist.buildSortingCharacter(title)}"
+            # Properties of the new created node.
+            properties:
+              name: "${Archivist.buildSortingCharacter(title)}"
+              title: "${Archivist.buildSortingCharacter(title)}"
 ```
 
 ### Define multiple configurations for the same NodeType
