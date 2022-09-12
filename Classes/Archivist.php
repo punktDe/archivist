@@ -15,8 +15,8 @@ use Neos\Flow\Annotations as Flow;
 use Neos\ContentRepository\Domain\Model\NodeInterface;
 use Neos\Flow\Log\ThrowableStorageInterface;
 use Neos\Flow\Log\Utility\LogEnvironment;
-use Neos\Neos\Ui\Domain\Model\Feedback\Operations\NodeCreated;
 use Neos\Neos\Ui\Domain\Model\Feedback\Operations\UpdateNodeInfo;
+use Neos\Neos\Ui\Domain\Model\Feedback\Operations\UpdateNodePath;
 use Neos\Neos\Ui\Domain\Model\FeedbackCollection;
 use Psr\Log\LoggerInterface;
 use PunktDe\Archivist\Exception\ArchivistConfigurationException;
@@ -135,12 +135,14 @@ class Archivist
             $hierarchyNode = $this->hierarchyService->buildHierarchy($sortingInstructions['hierarchy'], $context, $sortingInstructions['publishHierarchy'] ?? false);
 
             if ($hierarchyNode !== $affectedNode->getParent() && $hierarchyNode->getNode($affectedNode->getName()) === null) {
-
                 $this->affectedNodeStorage->addNode($affectedNode);
+
+                $oldContextPath = $affectedNode->getContextPath();
                 $affectedNode->moveInto($hierarchyNode);
                 $this->organizedNodeParents[$affectedNode->getIdentifier()] = $affectedNode->getParent();
+                $newContextPath = $affectedNode->getContextPath();
 
-                $this->sendNodeMovedFeedback($affectedNode, $hierarchyNode);
+                $this->sendNodeMovedFeedback($hierarchyNode, $affectedNode, $oldContextPath, $newContextPath);
 
                 $this->logger->info(sprintf('Moved affected node %s to path %s', $affectedNode->getNodeType()->getName(), $affectedNode->getPath()), LogEnvironment::fromMethodName(__METHOD__));
             }
@@ -259,15 +261,13 @@ class Archivist
     }
 
     /**
-     * @param NodeInterface $affectedNode
      * @param NodeInterface $hierarchyNode
+     * @param NodeInterface $affectedNode
+     * @param string $oldContextPath
+     * @param string $newContextPath
      */
-    private function sendNodeMovedFeedback(NodeInterface $affectedNode, NodeInterface $hierarchyNode): void
+    private function sendNodeMovedFeedback(NodeInterface $hierarchyNode, NodeInterface $affectedNode, string $oldContextPath, string $newContextPath): void
     {
-        $created = new NodeCreated();
-        $created->setNode($affectedNode);
-        $this->feedbackCollection->add($created);
-
         $updateNodeInfo = new UpdateNodeInfo();
         $updateNodeInfo->setNode($hierarchyNode);
         $this->feedbackCollection->add($updateNodeInfo);
@@ -275,6 +275,11 @@ class Archivist
         $updateNodeInfo = new UpdateNodeInfo();
         $updateNodeInfo->setNode($affectedNode);
         $this->feedbackCollection->add($updateNodeInfo);
+
+        $updateNodePath = new UpdateNodePath();
+        $updateNodePath->setOldContextPath($oldContextPath);
+        $updateNodePath->setNewContextPath($newContextPath);
+        $this->feedbackCollection->add($updateNodePath);
     }
 }
 
