@@ -20,6 +20,7 @@ Configuration for the nodeType 'PunktDe.Archivist.TriggerNode'. The sorting is t
 node of this type is created or if a property on this node is changed. This node is then
 available as 'node' in the other parts of the configuration
 
+```
 PunktDe:
   Archivist:
     sortingInstructions:
@@ -70,7 +71,7 @@ PunktDe:
 
             # Simple sorting on a property
             sorting: title
-
+```
 
 ### Example with a triggering content node
 
